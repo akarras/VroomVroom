@@ -3,7 +3,7 @@
 #ifndef __AKZFVroomVroomADV_H__
 #define __AKZFVroomVroomADV_H__
 
-#include "EngineMinimal.h"
+#include "Engine.h"
 
 #define HMD_MODULE_INCLUDED 1
 
