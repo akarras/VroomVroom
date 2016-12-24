@@ -12,18 +12,18 @@ AAKZFRaceCheckpoint::AAKZFRaceCheckpoint()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	UBoxComponent* box = CreateDefaultSubobject<UBoxComponent>(FName("Collision Box"));
+	box = CreateDefaultSubobject<UBoxComponent>(FName("Collision Box"));
 	box->OnComponentBeginOverlap.AddDynamic(this, &AAKZFRaceCheckpoint::OnOverlapped);
+	//RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root Scenecomponent"));
+	box->AttachToComponent(RootComponent, FAttachmentTransformRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, false));
 
-	RootComponent = box;
-
+	NextCheckpointNumber = CheckpointNumber + 1;
 }
 
 // Called when the game starts or when spawned
 void AAKZFRaceCheckpoint::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AAKZFRaceCheckpoint::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -45,10 +45,8 @@ void AAKZFRaceCheckpoint::OnOverlapped(UPrimitiveComponent* OverlappedComponent,
 				{
 					state->LapsComplete++; // Increment laps complete
 				}
-
+				GEngine->AddOnScreenDebugMessage(1, 200.0f, FColor(255, 0, 0), FString("Checkpoint Number ") + FString::FormatAsNumber(CheckpointNumber));
 			}
-			
-
 		}
 	}
 }

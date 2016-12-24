@@ -20,11 +20,9 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	UFUNCTION()
 	void OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Volume")
-	FVector Volume;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
 	int CheckpointNumber;
 	
@@ -34,4 +32,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checkpoint")
 	bool IsLapFinisher;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Box")
+	UBoxComponent* box;
 };
