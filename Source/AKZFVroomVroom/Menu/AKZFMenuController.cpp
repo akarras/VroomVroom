@@ -6,7 +6,12 @@
 
 AAKZFMenuController::AAKZFMenuController()
 {
-	FStringAssetReference MenuWidget(FString("WidgetBlueprint'/Game/VroomVroom/UI/MainMenu.MainMenu'"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> MenuWidget(TEXT("WidgetBlueprint'/Game/VroomVroom/UI/MainMenu.MainMenu'"));
+	if (MenuWidget.Class) 
+	{
+		GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor(0, 255, 0), MenuWidget.Class->GetPathName());
+	}
+	/*FStringAssetReference MenuWidget(FString("WidgetBlueprint'/Game/VroomVroom/UI/MainMenu.MainMenu'"));
 	UObject* menuObject = MenuWidget.TryLoad();
 	if (menuObject)
 	{
@@ -16,13 +21,12 @@ AAKZFMenuController::AAKZFMenuController()
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(0, 10.0f, FColor(255, 0, 0), FString("Widget Class Not Loaded"));
-	}
+	}*/
 }
 
 void AAKZFMenuController::BeginPlay()
 {
-	static ConstructorHelpers::FClassFinder<UUserWidget> MenuWidget(TEXT("WidgetBlueprint'/Game/VroomVroom/UI/MainMenu.MainMenu'"));
-	
+
 	/*if (menuObject)
 	{
 		GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor(0, 255, 0), menuObject->GetClass()->GetName());
@@ -34,8 +38,6 @@ void AAKZFMenuController::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(2, 10.0f, FColor(255, 250, 0), FString("Widget Class Not Loaded"));
 	}*/
-
-
 	bShowMouseCursor = true;
 	if (MenuClass)
 	{

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
 #include "AKZFMenuController.generated.h"
 
 /**
@@ -17,9 +18,10 @@ public:
 	
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UMG")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> MenuClass;
 
+	UPROPERTY(BlueprintReadWrite, Category="Widgets")
 	UUserWidget* MainMenu;
 	
 };
