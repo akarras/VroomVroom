@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/GameModeBase.h"
+#include "Data/MapData.h"
 #include "AKZFLobbyGameMode.generated.h"
 
 /**
@@ -18,4 +19,8 @@ public:
 	
 	void StartGame();
 	
+	FMapInformation SelectedMap;
+
+	UFUNCTION(BlueprintCallable, Category="Data")
+	TArray<FMapInformation> LoadMaps();
 };

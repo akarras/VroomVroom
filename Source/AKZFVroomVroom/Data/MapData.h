@@ -31,7 +31,7 @@ UCLASS()
 class AKZFVROOMVROOM_API UMapData : public UDataAsset
 {
 	GENERATED_BODY()
-
+public:
 	UPROPERTY(EditAnywhere)
 	TArray<FMapInformation> Maps;
 	

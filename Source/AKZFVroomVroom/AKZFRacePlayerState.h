@@ -23,5 +23,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Score")
 	int LapsComplete;
 	
-	
+	UPROPERTY(BlueprintReadWrite, Category = "Score")
+	bool HasFinished;
 };
