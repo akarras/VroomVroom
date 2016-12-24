@@ -13,7 +13,9 @@ class AKZFVROOMVROOM_API AAKZFLobbyGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	AAKZFLobbyGameMode();
 	
-	
+	void StartGame();
 	
 };
