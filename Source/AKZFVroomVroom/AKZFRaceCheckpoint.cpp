@@ -1,0 +1,62 @@
+// Copyright Aaron Karras and Zachary Frye
+
+#include "AKZFVroomVroom.h"
+#include "AKZFVroomVroomPawn.h"
+#include "AKZFRacePlayerState.h"
+#include "AKZFRaceCheckpoint.h"
+
+
+// Sets default values
+AAKZFRaceCheckpoint::AAKZFRaceCheckpoint()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	UBoxComponent* box = CreateDefaultSubobject<UBoxComponent>(FName("Collision Box"));
+	box->OnComponentBeginOverlap.AddDynamic(this, &AAKZFRaceCheckpoint::OnOverlapped);
+
+	RootComponent = box;
+
+}
+
+// Called when the game starts or when spawned
+void AAKZFRaceCheckpoint::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+void AAKZFRaceCheckpoint::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	if (Role == ROLE_Authority) 
+	{
+		AAKZFVroomVroomPawn* pawn = Cast<AAKZFVroomVroomPawn>(OtherActor);
+		if (pawn)
+		{
+			// Get the player's state
+			AAKZFRacePlayerState* state = Cast<AAKZFRacePlayerState>(pawn->PlayerState);
+			int nextCheckpoint = state->NextCheckpoint; // Get the player's next checkpoint
+			if (CheckpointNumber == nextCheckpoint) // Check if this is the checkpoint they're going for
+			{
+				// If so set their next checkpoint to our next checkpoint
+				state->NextCheckpoint = NextCheckpointNumber;
+
+				if (IsLapFinisher) // Check if this is the final goal
+				{
+					state->LapsComplete++; // Increment laps complete
+				}
+
+			}
+			
+
+		}
+	}
+}
+
+// Called every frame
+void AAKZFRaceCheckpoint::Tick( float DeltaTime )
+{
+	Super::Tick( DeltaTime );
+
+}
+
