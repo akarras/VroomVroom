@@ -26,3 +26,17 @@ TArray<FMapInformation> AAKZFLobbyGameMode::LoadMaps()
 	UMapData* asset = Cast<UMapData>(MapReference.TryLoad());
 	return asset->Maps;
 }
+
+void AAKZFLobbyGameMode::PostLogin(APlayerController* controller)
+{
+	ConnectedPlayers.Add(controller);
+}
+
+void AAKZFLobbyGameMode::Logout(AController* controller)
+{
+	APlayerController* playerController = Cast<APlayerController>(controller);
+	if (playerController)
+	{
+		ConnectedPlayers.Remove(playerController);
+	}
+}

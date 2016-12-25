@@ -40,7 +40,7 @@ void AAKZFRaceCheckpoint::OnOverlapped(UPrimitiveComponent* OverlappedComponent,
 			{
 				// If so set their next checkpoint to our next checkpoint
 				state->NextCheckpoint = NextCheckpointNumber;
-
+				state->LastCheckpoint = CheckpointNumber;
 				if (IsLapFinisher) // Check if this is the final goal
 				{
 					state->LapsComplete++; // Increment laps complete

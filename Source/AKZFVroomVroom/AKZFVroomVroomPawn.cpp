@@ -86,7 +86,11 @@ AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(0.0f, 1.0f);
 	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(40.0f, 0.7f);
 	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(120.0f, 0.6f);
-			
+	
+	// TODO We should figure out how to make it so we don't need this
+	Vehicle4W->bDeprecatedSpringOffsetMode = true;
+
+
  	// Transmission	
 	// We want 4wd
 	Vehicle4W->DifferentialSetup.DifferentialType = EVehicleDifferential4W::LimitedSlip_4W;

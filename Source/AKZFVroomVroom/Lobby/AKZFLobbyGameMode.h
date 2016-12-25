@@ -23,4 +23,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Data")
 	TArray<FMapInformation> LoadMaps();
+
+	virtual void PostLogin(APlayerController* controller) override;
+	virtual void Logout(AController* controller) override;
+	TArray<APlayerController*> ConnectedPlayers;
 };
