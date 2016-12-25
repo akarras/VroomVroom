@@ -4,6 +4,7 @@
 #include "AKZFVroomVroomGameMode.h"
 #include "AKZFVroomVroomPawn.h"
 #include "AKZFRacePlayerState.h"
+#include "AKZFRaceGameState.h"
 #include "AKZFVroomVroomHud.h"
 
 AAKZFVroomVroomGameMode::AAKZFVroomVroomGameMode()
@@ -11,4 +12,5 @@ AAKZFVroomVroomGameMode::AAKZFVroomVroomGameMode()
 	DefaultPawnClass = AAKZFVroomVroomPawn::StaticClass();
 	HUDClass = AAKZFVroomVroomHud::StaticClass();
 	PlayerStateClass = AAKZFRacePlayerState::StaticClass();
+	GameStateClass = AAKZFRaceGameState::StaticClass();
 }
