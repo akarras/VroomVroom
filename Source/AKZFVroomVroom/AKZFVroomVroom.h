@@ -4,7 +4,8 @@
 #define __AKZFVroomVroomADV_H__
 
 #include "Engine.h"
-
+#include "UnrealNetwork.h"
+#include "Online.h"
 #define HMD_MODULE_INCLUDED 1
 
 #endif
