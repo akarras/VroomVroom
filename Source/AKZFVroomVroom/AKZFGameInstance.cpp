@@ -2,3 +2,206 @@
 
 #include "AKZFVroomVroom.h"
 #include "AKZFGameInstance.h"
+
+UAKZFGameInstance::UAKZFGameInstance()
+{
+	// Creation delegates
+	OnCreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnCreateSessionComplete);
+	OnStartSessionCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnStartOnlineGameComplete);
+	// Find session delegates
+	OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnFindSessionsComplete);
+}
+
+void UAKZFGameInstance::CreateLobby(FName SessionName)
+{
+	// Local player instance
+	ULocalPlayer* const localPlayer = GetFirstGamePlayer();
+	HostSession(localPlayer->GetPreferredUniqueNetId(), SessionName, false, false, 4);
+}
+
+bool UAKZFGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
+{
+	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
+	if (OnlineSub)
+	{
+		// Get the session interface
+		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+
+		if (Sessions.IsValid() && UserId.IsValid())
+		{
+			SessionSettings = MakeShareable(new FOnlineSessionSettings());
+			SessionSettings->bIsLANMatch = bIsLAN;
+			SessionSettings->bUsesPresence = bIsPresence;
+			SessionSettings->NumPublicConnections = MaxNumPlayers;
+			SessionSettings->NumPrivateConnections = 0;
+			SessionSettings->bAllowInvites = true;
+			SessionSettings->bAllowInvites = true;
+			SessionSettings->bAllowJoinViaPresence = true;
+			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
+			SessionSettings->Set(SETTING_MAPNAME, FString("Lobby"), EOnlineDataAdvertisementType::ViaOnlineService);
+
+			// Set the delegate to the Handle of the SessionInterface
+			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
+
+			// Our delegate should get called when this is complete (doesn't need to be succesful!")
+			return Sessions->CreateSession(*UserId, SessionName, *SessionSettings);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("No subsystem"));
+		}
+
+	}
+
+	return false;
+}
+
+void UAKZFGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("OnCreateSessionComplete %s, %d"), *SessionName.ToString(), bWasSuccessful));
+
+	// Get the OnlineSubsystem so we can get the Session Interface
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+	if (OnlineSub)
+	{
+		// Get the session interface
+		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+
+		if (Sessions.IsValid())
+		{
+			// Clear SessionComplete handle
+			Sessions->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
+			if (bWasSuccessful)
+			{
+				// Set the StartSession delegate handle
+				OnStartSessionCompleteDelegateHandle = Sessions->AddOnStartSessionCompleteDelegate_Handle(OnStartSessionCompleteDelegate);
+
+				// Our StartSessionComplete delegate
+				Sessions->StartSession(SessionName);
+			}
+		}
+	}
+}
+
+void UAKZFGameInstance::OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("OnStartSessionComplete &s, %d"), *SessionName.ToString(), bWasSuccessful));
+
+	// Get the Online Subsystem so that we can get the Session Interface
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+	if (OnlineSub)
+	{
+		// Get the Session Interface to clear the delegate
+		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		if (Sessions.IsValid())
+		{
+			// Clear the delegate, since we are done with this call
+			Sessions->ClearOnStartSessionCompleteDelegate_Handle(OnStartSessionCompleteDelegateHandle);
+		}
+	}
+
+	// If the start was successful, open ze map!
+	if (bWasSuccessful)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "listen");
+	}
+}
+
+void UAKZFGameInstance::FindSessions(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence)
+{
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+	if (OnlineSub)
+	{
+		
+		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		if (Sessions.IsValid() && UserId.IsValid())
+		{
+			SessionSearch = MakeShareable(new FOnlineSessionSearch());
+			SessionSearch->bIsLanQuery = bIsLAN;
+			SessionSearch->MaxSearchResults = 20;
+			SessionSearch->PingBucketSize = 50;
+
+			// Only search presence if bIsPresence is set to true
+			if (bIsPresence)
+			{
+				SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, bIsPresence, EOnlineComparisonOp::Equals);
+			}
+
+			TSharedRef<FOnlineSessionSearch> SearchSettingsRef = SessionSearch.ToSharedRef();
+
+			// Set the Delegate to the delegate handle of the FindSession function
+			OnFindSessionsCompleteDelegateHandle = Sessions->AddOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegate);
+
+			// Finally search!
+			Sessions->FindSessions(*UserId, SearchSettingsRef);
+		}
+	}
+	else
+	{
+		// If it dun work just say false on the sessions complete
+		OnFindSessionsComplete(false);
+	}
+}
+
+void UAKZFGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("OFindSessionsComplete bSuccess: %d"), bWasSuccessful));
+
+	// Get OnlineSubsystem
+	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
+	if (OnlineSub)
+	{
+		// Get sessions
+		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		if (Sessions.IsValid())
+		{
+			// Clear delegate handle since we finished call
+			Sessions->ClearOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
+			
+		}
+	}
+}
+
+TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
+{
+	UE_LOG(LogActor, Warning, TEXT("Trying to get friend names"));
+	TArray<TSharedRef<FOnlineFriend>> FriendsList;
+	TArray<FString> FriendNames;
+	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get(FName("Steam"));
+	
+	if (OnlineSub)
+	{
+		
+
+		IOnlineFriendsPtr Friends = OnlineSub->GetFriendsInterface();
+		IOnlineIdentityPtr Identity = OnlineSub->GetIdentityInterface();
+		
+		if (OnlineSub->GetIdentityInterface()->GetLoginStatus(0) == ELoginStatus::LoggedIn)
+		{
+			if (Friends.IsValid())
+			{
+				if (Friends->GetFriendsList(playerSlot, FString(""), FriendsList))
+				{
+					for (TSharedPtr<FOnlineFriend> Friend : FriendsList)
+					{
+						FriendNames.Add(Friend->GetDisplayName());
+						UE_LOG(LogActor, Warning, TEXT("Logged: %s"), *Friend->GetDisplayName());
+					}
+				}
+				else
+				{
+					UE_LOG(LogActor, Warning, TEXT("Error getting friends!"));
+				}
+			}
+			else
+			{
+				UE_LOG(LogActor, Warning, TEXT("Friends subsystem disabled"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogActor, Warning, TEXT("Not logged in!"));
+		}
+	}
+	return FriendNames;
+}
