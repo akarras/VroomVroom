@@ -17,9 +17,8 @@ class AKZFVROOMVROOM_API AAKZFLobbyGameMode : public AGameModeBase
 public:
 	AAKZFLobbyGameMode();
 	
+	UFUNCTION(BlueprintCallable, Category="Game")
 	void StartGame();
-	
-	FMapInformation SelectedMap;
 
 	UFUNCTION(BlueprintCallable, Category="Data")
 	TArray<FMapInformation> LoadMaps();

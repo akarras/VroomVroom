@@ -23,6 +23,7 @@ void AAKZFLobbyController::BeginPlay()
 	{
 		Menu = CreateWidget<UUserWidget>(this, MenuClass);
 		Menu->AddToViewport();
+		bShowMouseCursor = true;
 	}
 	else
 	{
