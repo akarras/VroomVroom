@@ -19,7 +19,7 @@ public:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-	TSubclassOf<class UUserWidget> MenuClass;
+	TSubclassOf<UObject> MenuClass;
 
 	UPROPERTY(BlueprintReadWrite, Category="Widgets")
 	UUserWidget* MainMenu;

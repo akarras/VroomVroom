@@ -9,7 +9,7 @@ AAKZFMenuController::AAKZFMenuController()
 	static ConstructorHelpers::FObjectFinder<UBlueprint> MenuWidget(TEXT("WidgetBlueprint'/Game/VroomVroom/UI/MainMenu.MainMenu'"));
 	if (MenuWidget.Object) 
 	{
-		TSubclassOf<UUserWidget> widget = MenuWidget.Object->GeneratedClass->GetClass();
+		MenuClass = MenuWidget.Object->GeneratedClass;
 	}
 }
 
@@ -18,9 +18,11 @@ void AAKZFMenuController::BeginPlay()
 	bShowMouseCursor = true;
 	if (MenuClass)
 	{
-		
 		MainMenu = CreateWidget<UUserWidget>(this, MenuClass);
-		MainMenu->AddToViewport();
+		if (MainMenu)
+		{
+			MainMenu->AddToViewport();
+		}
 	}
 	else 
 	{
