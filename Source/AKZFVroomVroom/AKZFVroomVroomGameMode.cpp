@@ -16,3 +16,10 @@ AAKZFVroomVroomGameMode::AAKZFVroomVroomGameMode()
 	PlayerStateClass = AAKZFRacePlayerState::StaticClass();
 	GameStateClass = AAKZFRaceGameState::StaticClass();
 }
+
+void AAKZFVroomVroomGameMode::PostLogin(APlayerController* controller)
+{
+	Super::PostLogin(controller);
+	AAKZFRacePlayerController* raceController = Cast<AAKZFRacePlayerController>(controller);
+	raceController->ConfigureUI();
+}

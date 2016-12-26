@@ -15,11 +15,28 @@ AAKZFRacePlayerController::AAKZFRacePlayerController()
 
 void AAKZFRacePlayerController::BeginPlay()
 {
-	if (OverlayClass)
-	{
-		Overlay = CreateWidget<UUserWidget>(this, OverlayClass);
-		Overlay->AddToPlayerScreen();
-	}
+	
 }
 
+void AAKZFRacePlayerController::ConfigureUI_Implementation()
+{
+	WidgetCleanup();
+	Overlay = CreateWidget<UUserWidget>(this, OverlayClass);
+	Overlay->AddToPlayerScreen();
+}
 
+void AAKZFRacePlayerController::WidgetCleanup()
+{
+	for (TObjectIterator<UUserWidget> itr; itr; ++itr)
+	{
+		UUserWidget* widget = *itr;
+		if (!widget->GetWorld())
+		{
+			continue;
+		}
+		else
+		{
+			widget->RemoveFromParent();
+		}
+	}
+}

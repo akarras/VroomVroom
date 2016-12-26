@@ -19,10 +19,15 @@ public:
 
 	virtual void BeginPlay() override;
 	
+	UFUNCTION(Client, Reliable)
+	void ConfigureUI();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Widget")
 	TSubclassOf<UObject> OverlayClass;
 
 	UPROPERTY(BlueprintReadWrite, Category="Widgets")
 	UUserWidget* Overlay;
+
+	void WidgetCleanup();
 	
 };

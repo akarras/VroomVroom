@@ -14,15 +14,17 @@ class AKZFVROOMVROOM_API AAKZFRacePlayerState : public APlayerState
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(BlueprintReadWrite, Category= "Checkpoint")
+	AAKZFRacePlayerState();
+
+	UPROPERTY(Replicated, BlueprintReadWrite, Category= "Checkpoint")
 	int NextCheckpoint;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Checkpoint")
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Checkpoint")
 	int LastCheckpoint;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Score")
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Score")
 	int LapsComplete;
 	
-	UPROPERTY(BlueprintReadWrite, Category = "Score")
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Score")
 	bool HasFinished;
 };

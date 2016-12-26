@@ -10,6 +10,8 @@ class AAKZFVroomVroomGameMode : public AGameModeBase
 
 public:
 	AAKZFVroomVroomGameMode();
+
+	virtual void PostLogin(APlayerController* controller) override;
 };
 
 
