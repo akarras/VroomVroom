@@ -5,6 +5,7 @@
 #include "AKZFVroomVroomWheelFront.h"
 #include "AKZFVroomVroomWheelRear.h"
 #include "AKZFVroomVroomHud.h"
+#include "AKZFRacePlayerState.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -189,6 +190,7 @@ void AAKZFVroomVroomPawn::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &AAKZFVroomVroomPawn::OnHandbrakePressed);
 	PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &AAKZFVroomVroomPawn::OnHandbrakeReleased);
 	PlayerInputComponent->BindAction("SwitchCamera", IE_Pressed, this, &AAKZFVroomVroomPawn::OnToggleCamera);
+	PlayerInputComponent->BindAction("Respawn", IE_Pressed, this, &AAKZFVroomVroomPawn::OnRespawn);
 
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AAKZFVroomVroomPawn::OnResetVR); 
 }
@@ -202,6 +204,14 @@ void AAKZFVroomVroomPawn::MoveForward(float Val)
 void AAKZFVroomVroomPawn::MoveRight(float Val)
 {
 	GetVehicleMovementComponent()->SetSteeringInput(Val);
+}
+
+void AAKZFVroomVroomPawn::OnRespawn() {
+	AAKZFRacePlayerState* state = static_cast<AAKZFRacePlayerState*>(this->PlayerState);
+	if (!state->HasFinished) {
+		int lastCheckpoint = state->LastCheckpoint;
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, "Respawning to checkpoint " + FString::FromInt(lastCheckpoint));
+	}
 }
 
 void AAKZFVroomVroomPawn::OnHandbrakePressed()

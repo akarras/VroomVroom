@@ -100,6 +100,8 @@ public:
 	void OnToggleCamera();
 	/** Handle reset VR device */
 	void OnResetVR();
+	/** Handle respawn pressed */
+	void OnRespawn();
 
 	static const FName LookUpBinding;
 	static const FName LookRightBinding;
