@@ -32,6 +32,12 @@ const FName AAKZFVroomVroomPawn::EngineAudioRPM("RPM");
 
 AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 {
+	// Setup Trace Params
+	traceParams.bTraceComplex = true;
+	traceParams.bTraceAsyncScene = true;
+	traceParams.bReturnPhysicalMaterial = true;
+	traceParams.AddIgnoredActor(this);
+
 	// Car mesh
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/VehicleAdv/Vehicle/Vehicle_SkelMesh.Vehicle_SkelMesh"));
 	GetMesh()->SetSkeletalMesh(CarMesh.Object);
@@ -198,13 +204,34 @@ void AAKZFVroomVroomPawn::SetupPlayerInputComponent(class UInputComponent* Playe
 
 void AAKZFVroomVroomPawn::MoveForward(float Val)
 {
-	GetVehicleMovementComponent()->SetThrottleInput(Val);
-
+	if (isGrounded()) {
+		GetVehicleMovementComponent()->SetThrottleInput(Val);
+	}
+	else {
+		FTransform t = GetVehicleMovementComponent()->UpdatedPrimitive->GetRelativeTransform();
+		FQuat rot = t.GetRotation();
+		FVector v;
+		v.X = 0;
+		v.Y = Val * 3.5;
+		v.Z = 0;
+		GetVehicleMovementComponent()->UpdatedPrimitive->SetPhysicsAngularVelocity(t.TransformVector(v), true);
+	}
 }
 
 void AAKZFVroomVroomPawn::MoveRight(float Val)
 {
-	GetVehicleMovementComponent()->SetSteeringInput(Val);
+	if (isGrounded()) {
+		GetVehicleMovementComponent()->SetSteeringInput(Val);
+	}
+	else {
+		FTransform t = GetVehicleMovementComponent()->UpdatedPrimitive->GetRelativeTransform();
+		FQuat rot = t.GetRotation();
+		FVector v;
+		v.X = Val * -3.5;
+		v.Y = 0;
+		v.Z = 0;
+		GetVehicleMovementComponent()->UpdatedPrimitive->SetPhysicsAngularVelocity(t.TransformVector(v), true);
+	}
 }
 
 void AAKZFVroomVroomPawn::OnRespawn() 
@@ -412,6 +439,26 @@ void AAKZFVroomVroomPawn::UpdatePhysicsMaterial()
 			bIsLowFriction = true;
 		}
 	}
+}
+
+bool AAKZFVroomVroomPawn::isGrounded() {
+	FVector beginLoc = GetActorLocation();
+	FVector endLoc = GetActorLocation();
+	endLoc.Z -= 50;
+	FHitResult OutHit;
+	GetWorld()->SweepSingleByChannel(OutHit, beginLoc, endLoc, FQuat(), ECC_Visibility, FCollisionShape::MakeSphere(10), traceParams);
+	//GetWorld()->LineTraceSingleByChannel(OutHit, beginLoc, endLoc, ECC_Visibility, traceParams);
+
+	if (OutHit.bBlockingHit) {
+		if (OutHit.GetActor()->ActorHasTag("Ground")) {
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Hit Ground");
+			return true;
+		}
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Null");
+	}
+	return false;
 }
 
 #undef LOCTEXT_NAMESPACE

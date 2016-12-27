@@ -127,7 +127,11 @@ private:
 	UPhysicalMaterial* SlipperyMaterial;
 	/** Non Slippery Material instance */
 	UPhysicalMaterial* NonSlipperyMaterial;
+	/** Check if car is touching the ground */
+	bool isGrounded();
 
+	/** Hit Parameters */
+	FCollisionQueryParams traceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 
 public:
 	/** Returns SpringArm subobject **/
