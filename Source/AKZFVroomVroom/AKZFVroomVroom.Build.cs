@@ -8,5 +8,6 @@ public class AKZFVroomVroom : ModuleRules
 	{
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "HeadMountedDisplay" });
         PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "OnlineSubsystem" });
+        DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 	}
 }

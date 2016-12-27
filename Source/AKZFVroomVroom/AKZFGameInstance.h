@@ -18,12 +18,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Friends")
 	TArray<FString> GetFriendNames(int PlayerId);
-	
-	UFUNCTION(BlueprintCallable, Category="Online")
-	void CreateLobby(FName SessionName);
+
+
+	UFUNCTION(BlueprintCallable, Category="Online|Session")
+	void ExitSession();
 
 	/* Begins hosting a session */
-	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
+	UFUNCTION(BlueprintCallable, Category="Online|Session")
+	bool HostSession( FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
 
 	/* Create session delegate, will be bound to in the constructor to recieve created 
 		session and forward onto OnCreate Sesssion which will then start the session.*/
@@ -43,7 +45,7 @@ public:
 	virtual void OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful);
 
 	/* Searches for available sessions */
-	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLame, bool bIsPrescense);
+	void FindSessions(FName SessionName, bool bIsLAN, bool bIsPrescense);
 
 	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
 	FDelegateHandle OnFindSessionsCompleteDelegateHandle;
@@ -51,4 +53,19 @@ public:
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 
 	void OnFindSessionsComplete(bool bWasSuccessful);
+	
+	bool JoinSession(FName SessionName, const FOnlineSessionSearchResult& SearchResult);
+
+	FOnJoinSessionCompleteDelegate OnJoinSessionCompleteDelegate;
+
+	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
+
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate;
+	FDelegateHandle OnSessionDestroyCompleteDelegateHandle;
+
+	/* Destroys the session */
+	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+
 };
