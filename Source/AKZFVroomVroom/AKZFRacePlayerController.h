@@ -23,7 +23,7 @@ public:
 	void ConfigureUI();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Widget")
-	TSubclassOf<UObject> OverlayClass;
+	TSubclassOf<UUserWidget> OverlayClass;
 
 	UPROPERTY(BlueprintReadWrite, Category="Widgets")
 	UUserWidget* Overlay;

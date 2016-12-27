@@ -6,11 +6,7 @@
 
 AAKZFRacePlayerController::AAKZFRacePlayerController()
 {
-	ConstructorHelpers::FObjectFinder<UBlueprint> BlueprintWidget(TEXT("WidgetBlueprint'/Game/VroomVroom/UI/Overlay.Overlay'"));
-	if (BlueprintWidget.Object)
-	{
-		OverlayClass = BlueprintWidget.Object->GeneratedClass;
-	}
+	
 }
 
 void AAKZFRacePlayerController::BeginPlay()
@@ -20,14 +16,21 @@ void AAKZFRacePlayerController::BeginPlay()
 
 void AAKZFRacePlayerController::ConfigureUI_Implementation()
 {
-	WidgetCleanup();
-	Overlay = CreateWidget<UUserWidget>(this, OverlayClass);
-	Overlay->AddToPlayerScreen();
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("Configuring UI"));
+	//WidgetCleanup();
+	if (OverlayClass)
+	{
+		Overlay = CreateWidget<UUserWidget>(this, OverlayClass);
+		if (Overlay)
+		{
+			Overlay->AddToPlayerScreen();
+		}
+	}
 }
 
 void AAKZFRacePlayerController::WidgetCleanup()
 {
-	for (TObjectIterator<UUserWidget> itr; itr; ++itr)
+	/*for (TObjectIterator<UUserWidget> itr; itr; ++itr)
 	{
 		UUserWidget* widget = *itr;
 		if (!widget->GetWorld())
@@ -38,5 +41,5 @@ void AAKZFRacePlayerController::WidgetCleanup()
 		{
 			widget->RemoveFromParent();
 		}
-	}
+	}*/
 }

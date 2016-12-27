@@ -6,11 +6,7 @@
 
 AAKZFMenuController::AAKZFMenuController()
 {
-	static ConstructorHelpers::FObjectFinder<UBlueprint> MenuWidget(TEXT("WidgetBlueprint'/Game/VroomVroom/UI/MainMenu.MainMenu'"));
-	if (MenuWidget.Object) 
-	{
-		MenuClass = MenuWidget.Object->GeneratedClass;
-	}
+	
 }
 
 void AAKZFMenuController::BeginPlay()
