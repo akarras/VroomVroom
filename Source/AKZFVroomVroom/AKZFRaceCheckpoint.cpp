@@ -3,6 +3,7 @@
 #include "AKZFVroomVroom.h"
 #include "AKZFVroomVroomPawn.h"
 #include "AKZFRacePlayerState.h"
+#include "AKZFRaceGameState.h"
 #include "AKZFRaceCheckpoint.h"
 
 
@@ -44,6 +45,13 @@ void AAKZFRaceCheckpoint::OnOverlapped(UPrimitiveComponent* OverlappedComponent,
 				if (IsLapFinisher) // Check if this is the final goal
 				{
 					state->LapsComplete++; // Increment laps complete
+					// Check if the player has finished all the laps!
+					AGameStateBase* game = UGameplayStatics::GetGameState(this);
+					AAKZFRaceGameState* raceState = Cast<AAKZFRaceGameState>(game);
+					if (raceState)
+					{
+						state->HasFinished = state->LapsComplete >= raceState->NumberOfLaps;
+					}
 				}
 				GEngine->AddOnScreenDebugMessage(1, 200.0f, FColor(255, 0, 0), FString("Checkpoint Number ") + FString::FormatAsNumber(CheckpointNumber));
 			}

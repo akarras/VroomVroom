@@ -12,5 +12,11 @@ UCLASS()
 class AKZFVROOMVROOM_API AAKZFRaceGameState : public AGameStateBase
 {
 	GENERATED_BODY()
-	
+
+public:
+
+	AAKZFRaceGameState();
+
+	UPROPERTY(Replicated, BlueprintReadWrite, Category="Laps")
+	int NumberOfLaps;
 };
