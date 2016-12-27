@@ -3,12 +3,12 @@
 #pragma once
 
 #include "Engine/GameInstance.h"
+#include "Data/SessionSearchResultWrapper.h"
 #include "AKZFGameInstance.generated.h"
 
-/**
- * 
- */
-UCLASS()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSessionsRecievedDelegate);
+
+UCLASS(Blueprintable, BlueprintType)
 class AKZFVROOMVROOM_API UAKZFGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
@@ -19,6 +19,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Friends")
 	TArray<FString> GetFriendNames(int PlayerId);
 
+	UPROPERTY(BlueprintReadOnly, Category="Online|Session")
+	TArray<USessionSearchResultWrapper*> Results;
+	
+	UPROPERTY(BlueprintAssignable, Category="Online|Session")
+	FSessionsRecievedDelegate SearchSessionsRecieved;
 
 	UFUNCTION(BlueprintCallable, Category="Online|Session")
 	void ExitSession();
@@ -45,6 +50,7 @@ public:
 	virtual void OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful);
 
 	/* Searches for available sessions */
+	UFUNCTION(BlueprintCallable, Category="Online|Session")
 	void FindSessions(FName SessionName, bool bIsLAN, bool bIsPrescense);
 
 	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
@@ -53,7 +59,10 @@ public:
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 
 	void OnFindSessionsComplete(bool bWasSuccessful);
-	
+
+	UFUNCTION(BlueprintCallable, Category="Online|Session")
+	bool JoinSession(USessionSearchResultWrapper* Result);
+
 	bool JoinSession(FName SessionName, const FOnlineSessionSearchResult& SearchResult);
 
 	FOnJoinSessionCompleteDelegate OnJoinSessionCompleteDelegate;

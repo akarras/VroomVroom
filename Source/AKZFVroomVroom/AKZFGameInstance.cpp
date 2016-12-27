@@ -1,6 +1,7 @@
 // Copyright Aaron Karras and Zachary Frye
 
 #include "AKZFVroomVroom.h"
+#include "Data/SessionSearchResultWrapper.h"
 #include "AKZFGameInstance.h"
 
 UAKZFGameInstance::UAKZFGameInstance()
@@ -152,9 +153,25 @@ void UAKZFGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 		{
 			// Clear delegate handle since we finished call
 			Sessions->ClearOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
-			
+			Results.Empty(SessionSearch->SearchResults.Num());
+			TArray<FOnlineSessionSearchResult> results = SessionSearch->SearchResults;
+			for (FOnlineSessionSearchResult Result : results)
+			{
+				USessionSearchResultWrapper* wrapper = new USessionSearchResultWrapper(Result);
+				Results.Add(wrapper);
+			}
+			if (SearchSessionsRecieved.IsBound())
+			{
+				SearchSessionsRecieved.Broadcast();
+			}
+			//SearchSessionsRecieved.Broadcast(Results);
 		}
 	}
+}
+
+bool UAKZFGameInstance::JoinSession(USessionSearchResultWrapper * Result)
+{
+	return JoinSession(GameSessionName, Result->SessionResult);
 }
 
 bool UAKZFGameInstance::JoinSession(FName SessionName, const FOnlineSessionSearchResult & SearchResult)
