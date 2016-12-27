@@ -102,6 +102,9 @@ public:
 	void OnResetVR();
 	/** Handle respawn pressed */
 	void OnRespawn();
+	/** Handle respawn on the server side */
+	UFUNCTION(Server, Reliable, WithValidation)
+	void RespawnServer();
 
 	static const FName LookUpBinding;
 	static const FName LookRightBinding;

@@ -6,6 +6,7 @@
 #include "AKZFVroomVroomWheelRear.h"
 #include "AKZFVroomVroomHud.h"
 #include "AKZFRacePlayerState.h"
+#include "AKZFRaceCheckpoint.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -206,12 +207,44 @@ void AAKZFVroomVroomPawn::MoveRight(float Val)
 	GetVehicleMovementComponent()->SetSteeringInput(Val);
 }
 
-void AAKZFVroomVroomPawn::OnRespawn() {
-	AAKZFRacePlayerState* state = static_cast<AAKZFRacePlayerState*>(this->PlayerState);
-	if (!state->HasFinished) {
+void AAKZFVroomVroomPawn::OnRespawn() 
+{
+	// Pretty much just tell the server we want to respawn when we press the button
+	RespawnServer();
+}
+
+void AAKZFVroomVroomPawn::RespawnServer_Implementation()
+{
+	// Handle respawning!
+	AAKZFRacePlayerState* state = Cast<AAKZFRacePlayerState>(PlayerState);
+	// Make sure the player's not already done
+	if (!state->HasFinished) 
+	{
+		// Get the previous checkpoint the player was at.
 		int lastCheckpoint = state->LastCheckpoint;
 		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Green, "Respawning to checkpoint " + FString::FromInt(lastCheckpoint));
+		// Get the actor for the checkpoint
+		TSubclassOf<AAKZFRaceCheckpoint> ClassToFind;
+		for (TObjectIterator<AAKZFRaceCheckpoint> Checkpoints; Checkpoints; ++Checkpoints)
+		{
+			AAKZFRaceCheckpoint* Checkpoint = *Checkpoints;
+			GEngine->AddOnScreenDebugMessage(-1, 6.0f, FColor::Magenta, FString::Printf(TEXT("Checkpoint #%d"), Checkpoint->CheckpointNumber));
+			if (Checkpoint->CheckpointNumber == lastCheckpoint)
+			{
+				// If the checkpoint we're checking is the checkpoint we're trying to go to, WE SHOULD GO THERE DAMNIT!
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString("Going to checkpoint!"));
+				SetActorTransform(Checkpoint->GetTransform(), false, nullptr, ETeleportType::TeleportPhysics);
+				return;
+			}
+		}
+		//GEngine->AddOnScreenDebugMessage(-1, 6.0f, FColor::Magenta, FString::Printf(TEXT("Checkpoint %d"), Actors.Num()));
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString("Checkpoint not found"));
+}
+
+bool AAKZFVroomVroomPawn::RespawnServer_Validate()
+{
+	return true; // ITS A BUTTON? I guess we could make sure they're not spamming. Still stupid.
 }
 
 void AAKZFVroomVroomPawn::OnHandbrakePressed()
