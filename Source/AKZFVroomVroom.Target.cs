@@ -8,6 +8,7 @@ public class AKZFVroomVroomTarget : TargetRules
 	public AKZFVroomVroomTarget(TargetInfo Target)
 	{
 		Type = TargetType.Game;
+        bUsesSteam = true;
 	}
 
 	//
