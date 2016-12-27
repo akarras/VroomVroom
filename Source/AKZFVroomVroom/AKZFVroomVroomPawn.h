@@ -106,6 +106,12 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void RespawnServer();
 
+	/** Handle moving foward and turning server side */
+	UFUNCTION(Server, Reliable, WithValidation)
+	void MoveForwardServer(float Val);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void MoveRightServer(float Val);
+
 	static const FName LookUpBinding;
 	static const FName LookRightBinding;
 	static const FName EngineAudioRPM;

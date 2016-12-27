@@ -180,6 +180,7 @@ AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 
 	bIsLowFriction = false;
 	bInReverseGear = false;
+	
 }
 
 void AAKZFVroomVroomPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -208,14 +209,23 @@ void AAKZFVroomVroomPawn::MoveForward(float Val)
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 	}
 	else {
-		FTransform t = GetVehicleMovementComponent()->UpdatedPrimitive->GetRelativeTransform();
-		FQuat rot = t.GetRotation();
-		FVector v;
-		v.X = 0;
-		v.Y = Val * 3.5;
-		v.Z = 0;
-		GetVehicleMovementComponent()->UpdatedPrimitive->SetPhysicsAngularVelocity(t.TransformVector(v), true);
+		MoveForwardServer(Val);
 	}
+}
+
+void AAKZFVroomVroomPawn::MoveForwardServer_Implementation(float Val) {
+	GetVehicleMovementComponent()->SetThrottleInput(0);
+	FTransform t = GetVehicleMovementComponent()->UpdatedPrimitive->GetRelativeTransform();
+	FQuat rot = t.GetRotation();
+	FVector v;
+	v.X = 0;
+	v.Y = Val * 3.5;
+	v.Z = 0;
+	GetVehicleMovementComponent()->UpdatedPrimitive->SetPhysicsAngularVelocity(t.TransformVector(v), true);
+}
+
+bool AAKZFVroomVroomPawn::MoveForwardServer_Validate(float Val) {
+	return true;
 }
 
 void AAKZFVroomVroomPawn::MoveRight(float Val)
@@ -224,14 +234,23 @@ void AAKZFVroomVroomPawn::MoveRight(float Val)
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
 	}
 	else {
-		FTransform t = GetVehicleMovementComponent()->UpdatedPrimitive->GetRelativeTransform();
-		FQuat rot = t.GetRotation();
-		FVector v;
-		v.X = Val * -3.5;
-		v.Y = 0;
-		v.Z = 0;
-		GetVehicleMovementComponent()->UpdatedPrimitive->SetPhysicsAngularVelocity(t.TransformVector(v), true);
+		MoveRightServer(Val);
 	}
+}
+
+void AAKZFVroomVroomPawn::MoveRightServer_Implementation(float Val) {
+	GetVehicleMovementComponent()->SetSteeringInput(0);
+	FTransform t = GetVehicleMovementComponent()->UpdatedPrimitive->GetRelativeTransform();
+	FQuat rot = t.GetRotation();
+	FVector v;
+	v.X = Val * -3.5;
+	v.Y = 0;
+	v.Z = 0;
+	GetVehicleMovementComponent()->UpdatedPrimitive->SetPhysicsAngularVelocity(t.TransformVector(v), true);
+}
+
+bool AAKZFVroomVroomPawn::MoveRightServer_Validate(float Val) {
+	return true;
 }
 
 void AAKZFVroomVroomPawn::OnRespawn() 
@@ -261,6 +280,8 @@ void AAKZFVroomVroomPawn::RespawnServer_Implementation()
 				// If the checkpoint we're checking is the checkpoint we're trying to go to, WE SHOULD GO THERE DAMNIT!
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString("Going to checkpoint!"));
 				SetActorTransform(Checkpoint->GetTransform(), false, nullptr, ETeleportType::TeleportPhysics);
+				GetMesh()->SetPhysicsLinearVelocity(FVector(0, 0, 0));
+				GetMesh()->SetPhysicsAngularVelocity(FVector(0, 0, 0));
 				return;
 			}
 		}
@@ -442,21 +463,17 @@ void AAKZFVroomVroomPawn::UpdatePhysicsMaterial()
 }
 
 bool AAKZFVroomVroomPawn::isGrounded() {
+	FVector downV = GetActorUpVector() * -1;
 	FVector beginLoc = GetActorLocation();
-	FVector endLoc = GetActorLocation();
-	endLoc.Z -= 50;
+	FVector endLoc = (downV * 50) + GetActorLocation();
+	//DrawDebugLine(GetWorld(), beginLoc, endLoc, FColor::Red, false, -1.0f, (uint8)'\000', 5.0f);
 	FHitResult OutHit;
 	GetWorld()->SweepSingleByChannel(OutHit, beginLoc, endLoc, FQuat(), ECC_Visibility, FCollisionShape::MakeSphere(10), traceParams);
-	//GetWorld()->LineTraceSingleByChannel(OutHit, beginLoc, endLoc, ECC_Visibility, traceParams);
 
 	if (OutHit.bBlockingHit) {
 		if (OutHit.GetActor()->ActorHasTag("Ground")) {
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Hit Ground");
 			return true;
 		}
-	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Null");
 	}
 	return false;
 }
