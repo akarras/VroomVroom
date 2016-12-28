@@ -17,6 +17,4 @@ public:
 
 	AAKZFRaceGameState();
 
-	UPROPERTY(Replicated, BlueprintReadWrite, Category="Laps")
-	int NumberOfLaps;
 };

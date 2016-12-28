@@ -3,7 +3,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "AKZFVroomVroomGameMode.generated.h"
 
-UCLASS(minimalapi)
+UCLASS()
 class AAKZFVroomVroomGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
@@ -13,6 +13,7 @@ public:
 
 	virtual void PostLogin(APlayerController* controller) override;
 	virtual void SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC) override;
+	virtual void Tick(float DeltaSeconds) override;
 };
 
 
