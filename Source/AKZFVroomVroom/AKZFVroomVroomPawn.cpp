@@ -45,7 +45,7 @@ AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 	static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/VehicleAdv/Vehicle/VehicleAnimationBlueprint"));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetAnimInstanceClass(AnimBPClass.Class);
-	GetMesh()->SetSimulatePhysics(true);
+
 	// Setup friction materials
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> SlipperyMat(TEXT("/Game/VehicleAdv/PhysicsMaterials/Slippery.Slippery"));
 	SlipperyMaterial = SlipperyMat.Object;
@@ -280,8 +280,8 @@ void AAKZFVroomVroomPawn::RespawnServer_Implementation()
 				// If the checkpoint we're checking is the checkpoint we're trying to go to, WE SHOULD GO THERE DAMNIT!
 				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString("Going to checkpoint!"));
 				SetActorTransform(Checkpoint->GetTransform(), false, nullptr, ETeleportType::TeleportPhysics);
-				//GetMesh()->SetPhysicsLinearVelocity(FVector(0, 0, 0));
-				//GetMesh()->SetPhysicsAngularVelocity(FVector(0, 0, 0));
+				GetMesh()->SetPhysicsLinearVelocity(FVector(0, 0, 0));
+				GetMesh()->SetPhysicsAngularVelocity(FVector(0, 0, 0));
 				return;
 			}
 		}
@@ -381,7 +381,7 @@ void AAKZFVroomVroomPawn::BeginPlay()
 	bInCarCameraActive = false;
 	InCarSpeed->SetVisibility(bInCarCameraActive);
 	InCarGear->SetVisibility(bInCarCameraActive);
-	
+
 	// Enable in car view if HMD is attached
 #if HMD_MODULE_INCLUDED
 	bWantInCar = UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled();
