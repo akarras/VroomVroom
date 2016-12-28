@@ -21,5 +21,20 @@ void AAKZFVroomVroomGameMode::PostLogin(APlayerController* controller)
 {
 	Super::PostLogin(controller);
 	AAKZFRacePlayerController* raceController = Cast<AAKZFRacePlayerController>(controller);
-	//raceController->ConfigureUI();
+	raceController->ConfigureUI();
+}
+
+void AAKZFVroomVroomGameMode::SwapPlayerControllers(APlayerController * OldPC, APlayerController * NewPC)
+{
+	Super::SwapPlayerControllers(OldPC, NewPC);
+	AAKZFRacePlayerController* RaceController = Cast<AAKZFRacePlayerController>(NewPC);
+	if (RaceController)
+	{
+		RaceController->ConfigureUI();
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString("Failed to cast RaceController"));
+	}
+
 }

@@ -12,6 +12,7 @@ public:
 	AAKZFVroomVroomGameMode();
 
 	virtual void PostLogin(APlayerController* controller) override;
+	virtual void SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC) override;
 };
 
 
