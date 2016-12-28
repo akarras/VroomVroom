@@ -31,11 +31,10 @@ bool UAKZFGameInstance::HostSession(FName SessionName, bool bIsLAN, bool bIsPres
 			SessionSettings->NumPublicConnections = MaxNumPlayers;
 			SessionSettings->NumPrivateConnections = 0;
 			SessionSettings->bAllowInvites = true;
-			SessionSettings->bAllowInvites = true;
+			SessionSettings->bShouldAdvertise = true;
 			SessionSettings->bAllowJoinViaPresence = true;
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
-			SessionSettings->Set(SETTING_MAPNAME, FString("Lobby"), EOnlineDataAdvertisementType::ViaOnlineService);
-
+			SessionSettings->Set(SETTING_MAPNAME, FString("Lobby"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 			// Set the delegate to the Handle of the SessionInterface
 			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
 
@@ -157,7 +156,8 @@ void UAKZFGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 			TArray<FOnlineSessionSearchResult> results = SessionSearch->SearchResults;
 			for (FOnlineSessionSearchResult Result : results)
 			{
-				USessionSearchResultWrapper* wrapper = new USessionSearchResultWrapper(Result);
+				USessionSearchResultWrapper* wrapper = ConstructObject<USessionSearchResultWrapper>(USessionSearchResultWrapper::StaticClass());
+				wrapper->SessionResult = Result;
 				Results.Add(wrapper);
 			}
 			if (SearchSessionsRecieved.IsBound())
