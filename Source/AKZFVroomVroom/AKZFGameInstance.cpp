@@ -26,7 +26,6 @@ bool UAKZFGameInstance::HostSession(FName SessionName, bool bIsLAN, bool bIsPres
 	{
 		// Get the session interface
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-
 		if (Sessions.IsValid())
 		{
 			SessionSettings = MakeShareable(new FOnlineSessionSettings());
@@ -36,9 +35,11 @@ bool UAKZFGameInstance::HostSession(FName SessionName, bool bIsLAN, bool bIsPres
 			SessionSettings->NumPrivateConnections = 0;
 			SessionSettings->bAllowInvites = true;
 			SessionSettings->bShouldAdvertise = true;
+			SessionSettings->bAllowJoinInProgress = true;
 			SessionSettings->bAllowJoinViaPresence = true;
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
 			SessionSettings->Set(SETTING_MAPNAME, FString("Lobby"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+			
 			// Set the delegate to the Handle of the SessionInterface
 			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
 

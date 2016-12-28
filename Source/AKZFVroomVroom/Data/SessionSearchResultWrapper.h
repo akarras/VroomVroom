@@ -17,6 +17,9 @@ public:
 	USessionSearchResultWrapper();
 	FOnlineSessionSearchResult SessionResult;
 	USessionSearchResultWrapper(FOnlineSessionSearchResult Session);
-	UFUNCTION(BlueprintCallable, Category="SessionDetails")
+	UFUNCTION(BlueprintCallable, Category="Session|Details")
 	FString GetOwnerName();
+
+	UFUNCTION(BlueprintCallable, Category = "Session|Details")
+	FString GetSessionID();
 };

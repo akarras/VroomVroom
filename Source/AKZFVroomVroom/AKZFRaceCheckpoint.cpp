@@ -50,7 +50,7 @@ void AAKZFRaceCheckpoint::OnOverlapped(UPrimitiveComponent* OverlappedComponent,
 					AAKZFRaceGameState* raceState = Cast<AAKZFRaceGameState>(game);
 					if (raceState)
 					{
-						//HasFinished = state->LapsComplete >= raceState->NumberOfLaps;
+						HasFinished = state->LapsComplete >= raceState->NumberOfLaps;
 					}
 				}
 				GEngine->AddOnScreenDebugMessage(1, 200.0f, FColor(255, 0, 0), FString("Checkpoint Number ") + FString::FormatAsNumber(CheckpointNumber));
