@@ -157,7 +157,7 @@ void UAKZFGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 			TArray<FOnlineSessionSearchResult> results = SessionSearch->SearchResults;
 			for (FOnlineSessionSearchResult Result : results)
 			{
-				USessionSearchResultWrapper* wrapper = ConstructObject<USessionSearchResultWrapper>(USessionSearchResultWrapper::StaticClass());
+				USessionSearchResultWrapper* wrapper = NewObject<USessionSearchResultWrapper>(USessionSearchResultWrapper::StaticClass());
 				wrapper->SessionResult = Result;
 				Results.Add(wrapper);
 			}
