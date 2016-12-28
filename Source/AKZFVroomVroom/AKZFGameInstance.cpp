@@ -13,6 +13,8 @@ UAKZFGameInstance::UAKZFGameInstance()
 	OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnFindSessionsComplete);
 	// Destroy Session Delegate
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnDestroySessionComplete);
+	// Join Session Delegate
+	OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnJoinSessionComplete);
 	// Read friends list delegate
 	OnReadFriendsListCompleteDelegate = FOnReadFriendsListComplete::CreateUObject(this, &UAKZFGameInstance::OnFriendsReadComplete);
 }
@@ -178,7 +180,7 @@ bool UAKZFGameInstance::JoinSession(USessionSearchResultWrapper * Result)
 bool UAKZFGameInstance::JoinSession(FName SessionName, const FOnlineSessionSearchResult & SearchResult)
 {
 	bool bSuccessful = false;
-
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("Attempting to join session"));
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
