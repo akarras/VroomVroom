@@ -13,6 +13,10 @@ public:
 
 	virtual void PostLogin(APlayerController* controller) override;
 	virtual void SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC) override;
+
+	virtual void Logout(AController* controller) override;
+
+	TArray<class AAKZFRacePlayerController*> ConnectedControllers;
 };
 
 
