@@ -13,6 +13,8 @@ UAKZFGameInstance::UAKZFGameInstance()
 	OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnFindSessionsComplete);
 	// Destroy Session Delegate
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnDestroySessionComplete);
+	// Read friends list delegate
+	OnReadFriendsListCompleteDelegate = FOnReadFriendsListComplete::CreateUObject(this, &UAKZFGameInstance::OnFriendsReadComplete);
 }
 
 bool UAKZFGameInstance::HostSession(FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
@@ -115,7 +117,6 @@ void UAKZFGameInstance::FindSessions(FName SessionName, bool bIsLAN, bool bIsPre
 			SessionSearch->bIsLanQuery = bIsLAN;
 			SessionSearch->MaxSearchResults = 20;
 			SessionSearch->PingBucketSize = 50;
-
 			// Only search presence if bIsPresence is set to true
 			if (bIsPresence)
 			{
@@ -252,6 +253,25 @@ void UAKZFGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuc
 	}
 }
 
+bool UAKZFGameInstance::ReadFriendsList()
+{
+	bool Success = false;
+	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
+	if (OnlineSub)
+	{
+		IOnlineFriendsPtr Friends = OnlineSub->GetFriendsInterface();
+		if (Friends.IsValid())
+		{
+			Success = Friends->ReadFriendsList(0, FString(""), OnReadFriendsListCompleteDelegate);
+		}
+	}
+	return Success;
+}
+
+void UAKZFGameInstance::OnFriendsReadComplete(int32 number, bool bWasSuccessful, const FString & ListName, const FString & NotAClue)
+{
+}
+
 TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
 {
 	UE_LOG(LogActor, Warning, TEXT("Trying to get friend names"));
@@ -270,6 +290,7 @@ TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
 			{
 				for (TSharedPtr<FOnlineFriend> Friend : FriendsList)
 				{
+					
 					FriendNames.Add(Friend->GetDisplayName());
 					UE_LOG(LogActor, Warning, TEXT("Logged: %s"), *Friend->GetDisplayName());
 				}

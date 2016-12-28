@@ -77,4 +77,13 @@ public:
 	/* Destroys the session */
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
+	/* Initiates a request to read all the friends */
+	UFUNCTION(BlueprintCallable,Category="Online|Friends")
+	bool ReadFriendsList();
+	/* Async delegates to be called when the friends list read is complete. */
+	FOnReadFriendsListComplete OnReadFriendsListCompleteDelegate;
+	FDelegateHandle OnReadFriendsListCompleteDelegateHandle;
+
+	/* Called when the friends list read is complete */
+	virtual void OnFriendsReadComplete(int32 number, bool bWasSuccessful, const FString& ListName, const FString& NotAClue);
 };
