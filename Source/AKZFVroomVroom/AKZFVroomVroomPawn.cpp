@@ -209,12 +209,12 @@ void AAKZFVroomVroomPawn::MoveForward(float Val)
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 	}
 	else {
+		GetVehicleMovementComponent()->SetThrottleInput(0);
 		MoveForwardServer(Val);
 	}
 }
 
 void AAKZFVroomVroomPawn::MoveForwardServer_Implementation(float Val) {
-	GetVehicleMovementComponent()->SetThrottleInput(0);
 	FTransform t = GetVehicleMovementComponent()->UpdatedPrimitive->GetRelativeTransform();
 	FQuat rot = t.GetRotation();
 	FVector v;
@@ -234,12 +234,12 @@ void AAKZFVroomVroomPawn::MoveRight(float Val)
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
 	}
 	else {
+		GetVehicleMovementComponent()->SetSteeringInput(0);
 		MoveRightServer(Val);
 	}
 }
 
 void AAKZFVroomVroomPawn::MoveRightServer_Implementation(float Val) {
-	GetVehicleMovementComponent()->SetSteeringInput(0);
 	FTransform t = GetVehicleMovementComponent()->UpdatedPrimitive->GetRelativeTransform();
 	FQuat rot = t.GetRotation();
 	FVector v;
