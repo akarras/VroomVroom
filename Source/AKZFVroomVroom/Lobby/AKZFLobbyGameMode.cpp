@@ -24,13 +24,19 @@ void AAKZFLobbyGameMode::StartGame()
 	AAKZFLobbyGameState* gameState = Cast<AAKZFLobbyGameState>(GameState);
 	if (gameState)
 	{
+		// Instructs all of the lobby controllers to remove their widget.
+		for (AAKZFLobbyController* controller : ConnectedPlayers)
+		{
+			controller->RemoveUserWidget();
+		}
+		// Travel to the new level
 		if (GetWorld()->ServerTravel(gameState->CurrentMap.Url))
 		{
 			GEngine->AddOnScreenDebugMessage(0, 10.0f, FColor(255, 0, 0), FString("Traveling!"));
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(0, 10.0f, FColor(255, 0, 0), FString("Shit"));
+			GEngine->AddOnScreenDebugMessage(0, 10.0f, FColor(255, 0, 0), FString("Failed, likely playing in PIE. Cannot do seamless travel from PIE"));
 		}
 	}
 	else
@@ -48,12 +54,17 @@ TArray<FMapInformation> AAKZFLobbyGameMode::LoadMaps()
 
 void AAKZFLobbyGameMode::PostLogin(APlayerController* controller)
 {
-	ConnectedPlayers.Add(controller);
+	AAKZFLobbyController* lobbyPC = Cast<AAKZFLobbyController>(controller);
+	if (lobbyPC)
+	{
+		lobbyPC->ConfigureUI();
+		ConnectedPlayers.Add(lobbyPC);
+	}
 }
 
 void AAKZFLobbyGameMode::Logout(AController* controller)
 {
-	APlayerController* playerController = Cast<APlayerController>(controller);
+	AAKZFLobbyController* playerController = Cast<AAKZFLobbyController>(controller);
 	if (playerController)
 	{
 		ConnectedPlayers.Remove(playerController);

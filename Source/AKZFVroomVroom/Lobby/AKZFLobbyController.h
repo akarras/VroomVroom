@@ -29,4 +29,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Test")
 	FCurrentMapDelegate OnMapUpdated;
 	
+	UFUNCTION(Client, Reliable, Category="Widgets")
+	void ConfigureUI();
+	UFUNCTION(Client, Reliable, Category="Widgets")
+	void RemoveUserWidget();
+	
 };

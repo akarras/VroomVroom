@@ -25,5 +25,5 @@ public:
 
 	virtual void PostLogin(APlayerController* controller) override;
 	virtual void Logout(AController* controller) override;
-	TArray<APlayerController*> ConnectedPlayers;
+	TArray<AAKZFLobbyController*> ConnectedPlayers;
 };

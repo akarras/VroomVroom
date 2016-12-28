@@ -10,10 +10,15 @@ AAKZFLobbyController::AAKZFLobbyController()
 
 void AAKZFLobbyController::BeginPlay()
 {
+	
+}
+
+void AAKZFLobbyController::ConfigureUI_Implementation()
+{
 	if (MenuClass)
 	{
 		Menu = CreateWidget<UUserWidget>(this, MenuClass);
-		if (Menu) 
+		if (Menu)
 		{
 			Menu->AddToViewport();
 		}
@@ -22,5 +27,13 @@ void AAKZFLobbyController::BeginPlay()
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(0, 10.0f, FColor(255, 0, 0), FString("Widget not loaded"));
+	}
+}
+
+void AAKZFLobbyController::RemoveUserWidget_Implementation()
+{
+	if (Menu)
+	{
+		Menu->RemoveFromParent();
 	}
 }
