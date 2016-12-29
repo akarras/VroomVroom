@@ -12,7 +12,7 @@ AAKZFRacePlayerState::AAKZFRacePlayerState()
 void AAKZFRacePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
+	DOREPLIFETIME(AAKZFRacePlayerState, MapVote);
 	DOREPLIFETIME(AAKZFRacePlayerState, NextCheckpoint);
 	DOREPLIFETIME(AAKZFRacePlayerState, LastCheckpoint);
 	DOREPLIFETIME(AAKZFRacePlayerState, LapsComplete);

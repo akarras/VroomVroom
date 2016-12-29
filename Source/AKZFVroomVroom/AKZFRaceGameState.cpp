@@ -2,6 +2,7 @@
 
 #include "AKZFVroomVroom.h"
 #include "AKZFVroomVroomGameMode.h"
+#include "AKZFVroomVroomPawn.h"
 #include "AKZFRacePlayerController.h"
 #include "AKZFRacePlayerState.h"
 #include "AKZFRaceGameState.h"
@@ -17,8 +18,9 @@ void AAKZFRaceGameState::BeginPlay()
 	Super::BeginPlay();
 	if (Role >= ROLE_Authority)
 	{
-		RaceState = ERaceState::R_Warmup;
-		UpdateRoundTime(15.0f);
+		// Starts the race state timer
+		RaceState = ERaceState::R_Warmup; // The game should start in Warmup
+		UpdateRoundTime(5.0f); // The warmup should only last five seconds.
 	}
 }
 
@@ -37,7 +39,7 @@ void AAKZFRaceGameState::AdvanceState()
 	case ERaceState::R_Warmup:
 		RaceState = ERaceState::R_Started;
 		// Restart the game for the game start
-		DoReset();
+		StartRace();
 		UpdateRoundTime(720.0f);
 		break;
 	case ERaceState::R_Started:
@@ -51,29 +53,37 @@ void AAKZFRaceGameState::AdvanceState()
 	case ERaceState::R_Finished:
 		// Might add server travel logic here.
 		// Or add a quick voting widget and not a full lobby.
+		
 		break;
 	}
 }
 
-void AAKZFRaceGameState::DoReset()
+void AAKZFRaceGameState::StartRace()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("Resetting warmup"));
 
 	AAKZFVroomVroomGameMode* RaceMode = Cast<AAKZFVroomVroomGameMode>(AuthorityGameMode);
 	if (RaceMode)
 	{
-		RaceMode->ResetLevel();
 		for (AAKZFRacePlayerController* controller : RaceMode->ConnectedControllers)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("Resetting a player?"));
-			RaceMode->RestartPlayer(controller);
-		}
-		for (APlayerState* State : PlayerArray)
-		{
-			AAKZFRacePlayerState* playerState = Cast<AAKZFRacePlayerState>(State);
-			playerState->Reset();
+			AAKZFVroomVroomPawn* racePawn = Cast<AAKZFVroomVroomPawn>(controller->GetPawn());
+			if (racePawn)
+			{
+				racePawn->bCanMove = true; // Tell all of our players that they are now allowed to move.
+			}
 		}
 	}
+}
+
+void AAKZFRaceGameState::RaceOver()
+{
+
+}
+
+void AAKZFRaceGameState::TravelNextMap()
+{
+
 }
 
 void AAKZFRaceGameState::UpdateRoundTime(float time)
@@ -85,4 +95,26 @@ void AAKZFRaceGameState::UpdateRoundTime(float time)
 void AAKZFRaceGameState::RoundTimerUp()
 {
 	AdvanceState(); // It advances the state! Such amazing technology.
+}
+
+TMap<FString, int> AAKZFRaceGameState::GetTalliedMapVotes()
+{
+	TMap<FString, int> Maps;
+	// Iterate through all player states
+	for (APlayerState* state : PlayerArray)
+	{
+		// Cast to our local player
+		/*AAKZFRacePlayerState* player = Cast<AAKZFRacePlayerState>(state);
+		if (Maps.Contains(player->MapVote))
+		{
+			int votes = *Maps.Find(player->MapVote); // Get the votes for the given map
+			Maps.Emplace(player->MapVote, votes + 1); // Add one to our votes and set it back into our maps.
+		}
+		else
+		{
+			Maps.Emplace(player->MapVote, 1); // No one else has voted for this map, so add it to our maps and give it a vote.
+		}*/
+	}
+	// Return the voter tally!
+	return Maps;
 }

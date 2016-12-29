@@ -28,18 +28,22 @@ void AAKZFRacePlayerController::ConfigureUI_Implementation()
 	}
 }
 
-void AAKZFRacePlayerController::WidgetCleanup()
+void AAKZFRacePlayerController::ShowEndGameMenu_Implementation()
 {
-	/*for (TObjectIterator<UUserWidget> itr; itr; ++itr)
+	if (EndMenuClass)
 	{
-		UUserWidget* widget = *itr;
-		if (!widget->GetWorld())
+		if (Overlay)
 		{
-			continue;
+			Overlay->RemoveFromParent(); // Remove the current overlay from the viewport
 		}
-		else
+		Overlay = CreateWidget<UUserWidget>(this, EndMenuClass);
+		if (Overlay)
 		{
-			widget->RemoveFromParent();
+			Overlay->AddToPlayerScreen();
 		}
-	}*/
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("End menu not specified in BP"));
+	}
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/PlayerState.h"
+#include "Data/MapData.h"
 #include "AKZFRacePlayerState.generated.h"
 
 /**
@@ -15,6 +16,9 @@ class AKZFVROOMVROOM_API AAKZFRacePlayerState : public APlayerState
 	
 public:
 	AAKZFRacePlayerState();
+
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "MapVoting")
+	FMapInformation MapVote;
 
 	UPROPERTY(Replicated, BlueprintReadWrite, Category= "Checkpoint")
 	int NextCheckpoint;

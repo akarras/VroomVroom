@@ -45,6 +45,10 @@ class AAKZFVroomVroomPawn : public AWheeledVehicle
 public:
 	AAKZFVroomVroomPawn();
 
+	/* Pregame movement lock */
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="GameState")
+	bool bCanMove;
+
 	/** The current speed as a string eg 10 km/h */
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly)
 	FText SpeedDisplayString;

@@ -19,15 +19,21 @@ public:
 
 	virtual void BeginPlay() override;
 	
+	/* Configures the overlay for the game */
 	UFUNCTION(Client, Reliable)
 	void ConfigureUI();
+
+	UFUNCTION(Client, Reliable)
+	void ShowEndGameMenu();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
+	TSubclassOf<UUserWidget> EndMenuClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Widget")
 	TSubclassOf<UUserWidget> OverlayClass;
 
+	/* The current user widget */
 	UPROPERTY(BlueprintReadWrite, Category="Widgets")
 	UUserWidget* Overlay;
-
-	void WidgetCleanup();
 	
 };

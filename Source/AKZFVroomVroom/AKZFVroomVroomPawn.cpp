@@ -32,6 +32,9 @@ const FName AAKZFVroomVroomPawn::EngineAudioRPM("RPM");
 
 AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 {
+	// Setup can move
+	bCanMove = false;
+
 	// Setup Trace Params
 	traceParams.bTraceComplex = true;
 	traceParams.bTraceAsyncScene = true;
@@ -183,6 +186,12 @@ AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 	
 }
 
+void AAKZFVroomVroomPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AAKZFVroomVroomPawn, bCanMove);
+}
+
 void AAKZFVroomVroomPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -205,12 +214,15 @@ void AAKZFVroomVroomPawn::SetupPlayerInputComponent(class UInputComponent* Playe
 
 void AAKZFVroomVroomPawn::MoveForward(float Val)
 {
-	if (isGrounded()) {
-		GetVehicleMovementComponent()->SetThrottleInput(Val);
-	}
-	else {
-		GetVehicleMovementComponent()->SetThrottleInput(0);
-		MoveForwardServer(Val);
+	if (bCanMove) // Todo, find a way of making it so the engine sounds still play even though we're not moving.
+	{
+		if (isGrounded()) {
+			GetVehicleMovementComponent()->SetThrottleInput(Val);
+		}
+		else {
+			GetVehicleMovementComponent()->SetThrottleInput(0);
+			MoveForwardServer(Val);
+		}
 	}
 }
 
