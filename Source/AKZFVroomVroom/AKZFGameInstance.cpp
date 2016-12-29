@@ -21,6 +21,7 @@ UAKZFGameInstance::UAKZFGameInstance()
 
 bool UAKZFGameInstance::HostSession(FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
 {
+	// Grab our default online subsystem
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
@@ -28,6 +29,7 @@ bool UAKZFGameInstance::HostSession(FName SessionName, bool bIsLAN, bool bIsPres
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
+			// Manufacture our session settings. MakeShareable makes a TSharedPtr, which is Unreal's shared_ptr.
 			SessionSettings = MakeShareable(new FOnlineSessionSettings());
 			SessionSettings->bIsLANMatch = bIsLAN;
 			SessionSettings->bUsesPresence = bIsPresence; // According to a stranger on the forums, false presence = Game Server, true presence = New session p2p API
@@ -48,7 +50,7 @@ bool UAKZFGameInstance::HostSession(FName SessionName, bool bIsLAN, bool bIsPres
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("No subsystem"));
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("No session subsystem"));
 		}
 
 	}
@@ -99,7 +101,6 @@ void UAKZFGameInstance::OnStartOnlineGameComplete(FName SessionName, bool bWasSu
 			Sessions->ClearOnStartSessionCompleteDelegate_Handle(OnStartSessionCompleteDelegateHandle);
 		}
 	}
-
 	// If the start was successful, open ze map!
 	if (bWasSuccessful)
 	{
@@ -109,10 +110,11 @@ void UAKZFGameInstance::OnStartOnlineGameComplete(FName SessionName, bool bWasSu
 
 void UAKZFGameInstance::FindSessions(FName SessionName, bool bIsLAN, bool bIsPresence)
 {
+	// Get our default subsystem
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
-		
+		// Grab our default session interface.
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
@@ -175,6 +177,7 @@ void UAKZFGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 
 bool UAKZFGameInstance::JoinSession(USessionSearchResultWrapper * Result)
 {
+	// Simply calls the C++ version of this. This function serves as a way to call it from our UMG widget.
 	return JoinSession(GameSessionName, Result->SessionResult);
 }
 
@@ -182,13 +185,17 @@ bool UAKZFGameInstance::JoinSession(FName SessionName, const FOnlineSessionSearc
 {
 	bool bSuccessful = false;
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("Attempting to join session"));
+	// Get our online subsystem
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
+		// Gets a reference to our sessions interface
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
+			// Set our delegate handle for joining the session
 			OnJoinSessionCompleteDelegateHandle = Sessions->AddOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegate);
+			// Attempt to join the given session.
 			bSuccessful = Sessions->JoinSession(0, SessionName, SearchResult);
 		}
 	}
@@ -199,21 +206,23 @@ bool UAKZFGameInstance::JoinSession(FName SessionName, const FOnlineSessionSearc
 void UAKZFGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("OnJoinSessionComplete %s, %d"), *SessionName.ToString(), static_cast<int32>(Result)));
+	// Get our online subsystem
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
+		// Gets a reference to our sessions interface
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-		
 		if (Sessions.IsValid())
 		{
 			// Make sure we clear the delegate that brought us here
 			Sessions->ClearOnJoinSessionCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
-
+			// Grab the first player controller in the session
 			APlayerController* const PlayerController = GetFirstLocalPlayerController();
 			FString TravelURL;
-
+			// Gets a connection string to our other player.
 			if (PlayerController && Sessions->GetResolvedConnectString(SessionName, TravelURL))
 			{
+				// Instruct the client to travel to the given url for the session.
 				PlayerController->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
 			}
 		}
@@ -223,14 +232,17 @@ void UAKZFGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionC
 
 void UAKZFGameInstance::ExitSession()
 {
+	// Get our online subsystem
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
+		// Get a reference to our session interface
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
+			// Set our delegate handle
 			OnSessionDestroyCompleteDelegateHandle = Sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
-
+			// Tell the session interface to destroy the current session.
 			Sessions->DestroySession(GameSessionName);
 		}
 	}
@@ -239,17 +251,19 @@ void UAKZFGameInstance::ExitSession()
 void UAKZFGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("OnDestroySessionComplete %s %d"), *SessionName.ToString(), static_cast<int32>(bWasSuccessful)));
-
+	// Get our online subsystem
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
+		// Get a reference to the sessions interface
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
+			// Clear the delegate handle for destroyin the session because we're done with it now
 			Sessions->ClearOnDestroySessionCompleteDelegate_Handle(OnSessionDestroyCompleteDelegateHandle);
-
 			if (bWasSuccessful)
 			{
+				// If we successfully destroy the session we should go back to our main menu
 				UGameplayStatics::OpenLevel(GetWorld(), "Menu", true);
 			}
 		}
@@ -259,12 +273,15 @@ void UAKZFGameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuc
 bool UAKZFGameInstance::ReadFriendsList()
 {
 	bool Success = false;
+	// Get the default online subsystem
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
+		// Gets a reference to our friends interface
 		IOnlineFriendsPtr Friends = OnlineSub->GetFriendsInterface();
 		if (Friends.IsValid())
 		{
+			// Starts to read the list, must later be read with GetFriendsList.
 			Success = Friends->ReadFriendsList(0, FString(""), OnReadFriendsListCompleteDelegate);
 		}
 	}
@@ -273,6 +290,8 @@ bool UAKZFGameInstance::ReadFriendsList()
 
 void UAKZFGameInstance::OnFriendsReadComplete(int32 number, bool bWasSuccessful, const FString & ListName, const FString & NotAClue)
 {
+	// Pass this onto our blueprint delegate
+	FriendsReadComplete.Broadcast(bWasSuccessful);
 }
 
 TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
@@ -280,22 +299,23 @@ TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
 	UE_LOG(LogActor, Warning, TEXT("Trying to get friend names"));
 	TArray<TSharedRef<FOnlineFriend>> FriendsList;
 	TArray<FString> FriendNames;
-	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get(FName("Steam"));
-	
+
+	// Get our default subsystem
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
 	{
+		// Gets our friend interface
 		IOnlineFriendsPtr Friends = OnlineSub->GetFriendsInterface();
-		IOnlineIdentityPtr Identity = OnlineSub->GetIdentityInterface();
-		Identity->AutoLogin(0);
 		if (Friends.IsValid())
 		{
+			// Tries to get our friend list
 			if (Friends->GetFriendsList(playerSlot, FString(""), FriendsList))
 			{
 				for (TSharedPtr<FOnlineFriend> Friend : FriendsList)
 				{
-					
+					// Iterates through the given friends and adds them to the friend names array
 					FriendNames.Add(Friend->GetDisplayName());
-					UE_LOG(LogActor, Warning, TEXT("Logged: %s"), *Friend->GetDisplayName());
+					//@todo Make a wrapper so that we can expose friends to blueprints. Man that sounds dirty.
 				}
 			}
 			else
@@ -304,5 +324,5 @@ TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
 			}
 		}
 	}
-	return FriendNames;
+	return FriendNames; // Returns our friends!
 }

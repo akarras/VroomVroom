@@ -7,6 +7,7 @@
 #include "AKZFGameInstance.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSessionsRecievedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFriendsReadCompleteDelegate, bool, bWasSuccessful);
 
 UCLASS(Blueprintable, BlueprintType)
 class AKZFVROOMVROOM_API UAKZFGameInstance : public UGameInstance
@@ -86,4 +87,8 @@ public:
 
 	/* Called when the friends list read is complete */
 	virtual void OnFriendsReadComplete(int32 number, bool bWasSuccessful, const FString& ListName, const FString& NotAClue);
+
+	/* Called to signal to blueprints that the read is complete */
+	UPROPERTY(BlueprintAssignable, Category="Online|Friends")
+	FFriendsReadCompleteDelegate FriendsReadComplete;
 };
