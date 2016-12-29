@@ -17,6 +17,8 @@ public:
 	virtual void Logout(AController* controller) override;
 
 	TArray<class AAKZFRacePlayerController*> ConnectedControllers;
+	
+	void SpawnSpectatorForController(AAKZFRacePlayerController* controller);
 };
 
 

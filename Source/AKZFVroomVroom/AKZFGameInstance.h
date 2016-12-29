@@ -4,6 +4,7 @@
 
 #include "Engine/GameInstance.h"
 #include "Data/SessionSearchResultWrapper.h"
+#include "Data/MapData.h"
 #include "AKZFGameInstance.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSessionsRecievedDelegate);
@@ -16,6 +17,9 @@ class AKZFVROOMVROOM_API UAKZFGameInstance : public UGameInstance
 public:
 
 	UAKZFGameInstance();
+
+	UFUNCTION(BlueprintCallable, Category="Maps")
+	TArray<FMapInformation> LoadMaps();
 
 	UFUNCTION(BlueprintCallable, Category="Friends")
 	TArray<FString> GetFriendNames(int PlayerId);

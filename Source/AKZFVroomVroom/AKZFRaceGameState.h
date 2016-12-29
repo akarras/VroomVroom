@@ -29,7 +29,6 @@ public:
 	/* Number of laps in the game state. */
 	UPROPERTY(Replicated, BlueprintReadWrite, Category="Laps")
 	int NumberOfLaps;
-
 	/* Current RaceState. Should only be assigned from AdvanceState. Really probably should make this a get only function. */
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Race State")
 	ERaceState RaceState;

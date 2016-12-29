@@ -10,6 +10,9 @@ struct AKZFVROOMVROOM_API FMapInformation
 {
 	GENERATED_USTRUCT_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Map")
+	int MapId;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Level Information")
 	FString Url;
 

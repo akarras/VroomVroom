@@ -51,3 +51,8 @@ void AAKZFVroomVroomGameMode::Logout(AController* controller)
 		ConnectedControllers.Remove(raceController);
 	}
 }
+
+void AAKZFVroomVroomGameMode::SpawnSpectatorForController(AAKZFRacePlayerController* controller)
+{
+
+}

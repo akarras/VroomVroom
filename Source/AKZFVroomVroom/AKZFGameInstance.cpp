@@ -19,6 +19,13 @@ UAKZFGameInstance::UAKZFGameInstance()
 	OnReadFriendsListCompleteDelegate = FOnReadFriendsListComplete::CreateUObject(this, &UAKZFGameInstance::OnFriendsReadComplete);
 }
 
+TArray<FMapInformation> UAKZFGameInstance::LoadMaps()
+{
+	FStringAssetReference MapReference(FString("MapData'/Game/VroomVroom/Data/Maps.Maps'"));
+	UMapData* asset = Cast<UMapData>(MapReference.TryLoad());
+	return asset->Maps;
+}
+
 bool UAKZFGameInstance::HostSession(FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
 {
 	// Grab our default online subsystem
