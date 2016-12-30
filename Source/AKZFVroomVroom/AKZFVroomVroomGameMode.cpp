@@ -15,6 +15,7 @@ AAKZFVroomVroomGameMode::AAKZFVroomVroomGameMode()
 	PlayerControllerClass = AAKZFRacePlayerController::StaticClass();
 	PlayerStateClass = AAKZFRacePlayerState::StaticClass();
 	GameStateClass = AAKZFRaceGameState::StaticClass();
+	bUseSeamlessTravel = true;
 }
 
 void AAKZFVroomVroomGameMode::PostLogin(APlayerController* controller)

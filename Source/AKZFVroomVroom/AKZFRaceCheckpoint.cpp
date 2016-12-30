@@ -4,6 +4,7 @@
 #include "AKZFVroomVroomPawn.h"
 #include "AKZFRacePlayerState.h"
 #include "AKZFRaceGameState.h"
+#include "AKZFRacePlayerController.h"
 #include "AKZFRaceCheckpoint.h"
 
 
@@ -51,6 +52,15 @@ void AAKZFRaceCheckpoint::OnOverlapped(UPrimitiveComponent* OverlappedComponent,
 					if (raceState)
 					{
 						state->HasFinished = state->LapsComplete >= raceState->NumberOfLaps;
+						if (raceState->RaceState == ERaceState::R_Started&&state->HasFinished)
+						{
+							raceState->AdvanceState();
+						}
+						if (state->HasFinished)
+						{
+							// Bai bai Mr. Pawn.
+							pawn->Destroy();
+						}
 					}
 				}
 				GEngine->AddOnScreenDebugMessage(1, 200.0f, FColor(255, 0, 0), FString("Checkpoint Number ") + FString::FormatAsNumber(CheckpointNumber));

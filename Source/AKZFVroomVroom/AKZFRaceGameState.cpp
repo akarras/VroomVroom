@@ -5,6 +5,7 @@
 #include "AKZFVroomVroomPawn.h"
 #include "AKZFRacePlayerController.h"
 #include "AKZFRacePlayerState.h"
+#include "AKZFGameInstance.h"
 #include "AKZFRaceGameState.h"
 
 AAKZFRaceGameState::AAKZFRaceGameState()
@@ -44,16 +45,17 @@ void AAKZFRaceGameState::AdvanceState()
 		break;
 	case ERaceState::R_Started:
 		RaceState = ERaceState::R_TimeToFinish;
-		UpdateRoundTime(60);
+		UpdateRoundTime(30);
 		break;
 	case ERaceState::R_TimeToFinish:
 		RaceState = ERaceState::R_Finished;
+		RaceOver();
 		UpdateRoundTime(30);
 		break;
 	case ERaceState::R_Finished:
 		// Might add server travel logic here.
 		// Or add a quick voting widget and not a full lobby.
-		
+		TravelNextMap();
 		break;
 	}
 }
@@ -61,10 +63,11 @@ void AAKZFRaceGameState::AdvanceState()
 void AAKZFRaceGameState::StartRace()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("Resetting warmup"));
-
+	// Gets the gamemode
 	AAKZFVroomVroomGameMode* RaceMode = Cast<AAKZFVroomVroomGameMode>(AuthorityGameMode);
 	if (RaceMode)
 	{
+		// Loops through all connected controller
 		for (AAKZFRacePlayerController* controller : RaceMode->ConnectedControllers)
 		{
 			AAKZFVroomVroomPawn* racePawn = Cast<AAKZFVroomVroomPawn>(controller->GetPawn());
@@ -78,12 +81,24 @@ void AAKZFRaceGameState::StartRace()
 
 void AAKZFRaceGameState::RaceOver()
 {
-
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString("Race over, swapping UI"));
+	// Gets the gamemode
+	AAKZFVroomVroomGameMode* RaceMode = Cast<AAKZFVroomVroomGameMode>(AuthorityGameMode);
+	if (RaceMode)
+	{
+		// Loops through all connected controllers
+		for (AAKZFRacePlayerController* controller : RaceMode->ConnectedControllers)
+		{
+			controller->ShowEndGameMenu();
+		}
+	}
 }
 
 void AAKZFRaceGameState::TravelNextMap()
 {
-
+	// Go to that awesome map! WOOT
+	FMapInformation winningMap = Maps[GetHighestVote()];
+	GetWorld()->ServerTravel(winningMap.Url);
 }
 
 void AAKZFRaceGameState::UpdateRoundTime(float time)
@@ -97,24 +112,52 @@ void AAKZFRaceGameState::RoundTimerUp()
 	AdvanceState(); // It advances the state! Such amazing technology.
 }
 
-TMap<FString, int> AAKZFRaceGameState::GetTalliedMapVotes()
+TArray<int> AAKZFRaceGameState::GetTalliedMapVotes()
 {
-	TMap<FString, int> Maps;
-	// Iterate through all player states
+	TArray<int> MapCounts;
+	if (Maps.Num() == 0) // If it's zero it's not loaded yet!
+	{
+		UAKZFGameInstance* instance = Cast<UAKZFGameInstance>(GetGameInstance());
+		if (instance)
+		{
+			Maps = instance->LoadMaps();
+			check(Maps.Num() != 0); // Check it's still not zero... We might have an issue.
+		}
+	}
+	MapCounts.SetNum(Maps.Num()); // Our map voting counts should probably be as big as the number of maps we have! Neat!
+	// Iterate through all player states and count em up
 	for (APlayerState* state : PlayerArray)
 	{
 		// Cast to our local player
-		/*AAKZFRacePlayerState* player = Cast<AAKZFRacePlayerState>(state);
-		if (Maps.Contains(player->MapVote))
+		AAKZFRacePlayerState* player = Cast<AAKZFRacePlayerState>(state);
+		// Increment the vote count for the given number
+		if (player->MapVote > 0)
 		{
-			int votes = *Maps.Find(player->MapVote); // Get the votes for the given map
-			Maps.Emplace(player->MapVote, votes + 1); // Add one to our votes and set it back into our maps.
+			// Only count the vote if it's in our array
+			int MapCount = MapCounts[player->MapVote];
+			MapCount = MapCount + 1;
+			MapCounts[player->MapVote] = MapCount;
 		}
-		else
-		{
-			Maps.Emplace(player->MapVote, 1); // No one else has voted for this map, so add it to our maps and give it a vote.
-		}*/
 	}
 	// Return the voter tally!
-	return Maps;
+	return MapCounts;
+}
+
+int AAKZFRaceGameState::GetHighestVote()
+{
+	// Simple select
+	int winningMap = 0; // Default to 0 winning our pick in case we don't win!
+	int winningCount = 0;
+	TArray<int> MapVotes = GetTalliedMapVotes();
+	for (int count = 0; count < MapVotes.Num(); count++)
+	{
+		int mapCount = MapVotes[count];
+		if (mapCount > winningCount)
+		{
+			// If the winning count is better, this is our winner. Congratulations new map!
+			winningMap = count;
+			winningCount = mapCount;
+		}
+	}
+	return winningMap;
 }

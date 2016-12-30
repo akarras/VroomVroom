@@ -7,6 +7,7 @@
 AAKZFRacePlayerState::AAKZFRacePlayerState()
 {
 	bReplicates = true;
+	MapVote = -1;
 }
 
 void AAKZFRacePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const

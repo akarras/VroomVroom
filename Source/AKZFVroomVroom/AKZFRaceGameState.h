@@ -49,5 +49,10 @@ public:
 	void TravelNextMap();
 
 	/* Tallies votes from player states*/
-	TMap<FString, int> GetTalliedMapVotes();
+	UFUNCTION(BlueprintCallable, Category = "Maps")
+	TArray<int> GetTalliedMapVotes();
+	/* Returns the index of the current best map */
+	int GetHighestVote();
+	
+	TArray<FMapInformation> Maps;
 };

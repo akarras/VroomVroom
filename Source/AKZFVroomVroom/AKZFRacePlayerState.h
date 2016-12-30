@@ -29,7 +29,7 @@ public:
 	AAKZFRacePlayerState();
 	/* Indicates the players vote for the next map. Gets counted by the GameState */
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "MapVoting")
-	FMapInformation MapVote;
+	int MapVote;
 	/* Indicates the next checkpoint for the player to go to */
 	UPROPERTY(Replicated, BlueprintReadWrite, Category= "Checkpoint")
 	int NextCheckpoint;
