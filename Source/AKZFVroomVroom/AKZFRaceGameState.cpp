@@ -97,6 +97,16 @@ void AAKZFRaceGameState::RaceOver()
 void AAKZFRaceGameState::TravelNextMap()
 {
 	// Go to that awesome map! WOOT
+	// Clean up the UI before travel
+	AAKZFVroomVroomGameMode* gameMode = Cast<AAKZFVroomVroomGameMode>(AuthorityGameMode);
+	if (gameMode)
+	{
+		for (AAKZFRacePlayerController* controller : gameMode->ConnectedControllers)
+		{
+			controller->RemoveWidget();
+		}
+	}
+
 	FMapInformation winningMap = Maps[GetHighestVote()];
 	GetWorld()->ServerTravel(winningMap.Url);
 }

@@ -27,6 +27,9 @@ public:
 	/* Configures the end game menu! */
 	UFUNCTION(Client, Reliable)
 	void ShowEndGameMenu();
+	/* Removes the end game mode */
+	UFUNCTION(Client, Reliable)
+	void RemoveWidget();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
 	TSubclassOf<UUserWidget> EndMenuClass;
