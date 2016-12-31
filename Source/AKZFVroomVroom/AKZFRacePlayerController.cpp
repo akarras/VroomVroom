@@ -21,7 +21,7 @@ void AAKZFRacePlayerController::SetupInputComponent()
 	InputComponent->BindAction(FName("Pause"), EInputEvent::IE_Released, this, &AAKZFRacePlayerController::ShowPauseMenu);
 }
 
-void AAKZFRacePlayerController::RemoveWidget()
+void AAKZFRacePlayerController::RemoveWidget_Implementation()
 {
 	if (Overlay)
 	{
