@@ -16,6 +16,8 @@ public:
 
 	virtual void Logout(AController* controller) override;
 
+	APawn* SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer, const FTransform& SpawnTransform) override;
+
 	TArray<class AAKZFRacePlayerController*> ConnectedControllers;
 	
 	void SpawnSpectatorForController(AAKZFRacePlayerController* controller);

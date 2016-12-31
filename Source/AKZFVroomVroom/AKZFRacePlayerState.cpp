@@ -18,4 +18,5 @@ void AAKZFRacePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> 
 	DOREPLIFETIME(AAKZFRacePlayerState, LastCheckpoint);
 	DOREPLIFETIME(AAKZFRacePlayerState, LapsComplete);
 	DOREPLIFETIME(AAKZFRacePlayerState, HasFinished);
+	DOREPLIFETIME(AAKZFRacePlayerState, Checkpoints);
 }

@@ -41,14 +41,16 @@ void AAKZFRaceCheckpoint::OnOverlapped(UPrimitiveComponent* OverlappedComponent,
 			if (CheckpointNumber == nextCheckpoint) // Check if this is the checkpoint they're going for
 			{
 				// If so set their next checkpoint to our next checkpoint
+				AGameStateBase* game = UGameplayStatics::GetGameState(this);
+				AAKZFRaceGameState* raceState = Cast<AAKZFRaceGameState>(game);
 				state->NextCheckpoint = NextCheckpointNumber;
 				state->LastCheckpoint = CheckpointNumber;
+				FCheckpointData data = FCheckpointData(CheckpointNumber, raceState->NumberOfLaps, raceState->GetServerWorldTimeSeconds());
+				state->Checkpoints.Add(data);
 				if (IsLapFinisher) // Check if this is the final goal
 				{
 					state->LapsComplete++; // Increment laps complete
 					// Check if the player has finished all the laps!
-					AGameStateBase* game = UGameplayStatics::GetGameState(this);
-					AAKZFRaceGameState* raceState = Cast<AAKZFRaceGameState>(game);
 					if (raceState)
 					{
 						state->HasFinished = state->LapsComplete >= raceState->NumberOfLaps;

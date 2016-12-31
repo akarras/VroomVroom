@@ -17,6 +17,9 @@ UAKZFGameInstance::UAKZFGameInstance()
 	OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnJoinSessionComplete);
 	// Read friends list delegate
 	OnReadFriendsListCompleteDelegate = FOnReadFriendsListComplete::CreateUObject(this, &UAKZFGameInstance::OnFriendsReadComplete);
+	// On Join Session 
+	
+	
 }
 
 TArray<FMapInformation> UAKZFGameInstance::LoadMaps()
@@ -75,7 +78,6 @@ void UAKZFGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSucc
 	{
 		// Get the session interface
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-
 		if (Sessions.IsValid())
 		{
 			// Clear SessionComplete handle
@@ -301,11 +303,11 @@ void UAKZFGameInstance::OnFriendsReadComplete(int32 number, bool bWasSuccessful,
 	FriendsReadComplete.Broadcast(bWasSuccessful);
 }
 
-TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
+TArray<UFriendBlueprintWrapper*> UAKZFGameInstance::GetFriendNames(int playerSlot)
 {
 	UE_LOG(LogActor, Warning, TEXT("Trying to get friend names"));
 	TArray<TSharedRef<FOnlineFriend>> FriendsList;
-	TArray<FString> FriendNames;
+	TArray<UFriendBlueprintWrapper*> WrappedFriends;
 
 	// Get our default subsystem
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -321,8 +323,9 @@ TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
 				for (TSharedPtr<FOnlineFriend> Friend : FriendsList)
 				{
 					// Iterates through the given friends and adds them to the friend names array
-					FriendNames.Add(Friend->GetDisplayName());
-					//@todo Make a wrapper so that we can expose friends to blueprints. Man that sounds dirty.
+					UFriendBlueprintWrapper* wrappedFriend = NewObject<UFriendBlueprintWrapper>();
+					wrappedFriend->Friend = Friend;
+					WrappedFriends.Add(wrappedFriend);
 				}
 			}
 			else
@@ -330,6 +333,18 @@ TArray<FString> UAKZFGameInstance::GetFriendNames(int playerSlot)
 				UE_LOG(LogActor, Warning, TEXT("Error getting friends!"));
 			}
 		}
+		// Sort the rows!
+		WrappedFriends.Sort();
 	}
-	return FriendNames; // Returns our friends!
+	return WrappedFriends; // Returns our friends!
+}
+
+bool UAKZFGameInstance::JoinSession(ULocalPlayer* player, int32 id)
+{
+	return false;
+}
+
+void UAKZFGameInstance::SessionUserInviteAccepted(const bool bWasSuccessful, const int32 number, TSharedPtr<const FUniqueNetId> userId, const FOnlineSessionSearchResult& sessionResult)
+{
+	JoinSession(FName("Friend"), sessionResult);
 }

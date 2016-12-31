@@ -4,6 +4,7 @@
 
 #include "Engine/GameInstance.h"
 #include "Data/SessionSearchResultWrapper.h"
+#include "Data/FriendBlueprintWrapper.h"
 #include "Data/MapData.h"
 #include "AKZFGameInstance.generated.h"
 
@@ -22,7 +23,7 @@ public:
 	TArray<FMapInformation> LoadMaps();
 
 	UFUNCTION(BlueprintCallable, Category="Friends")
-	TArray<FString> GetFriendNames(int PlayerId);
+	TArray<UFriendBlueprintWrapper*> GetFriendNames(int PlayerId);
 
 	UPROPERTY(BlueprintReadOnly, Category="Online|Session")
 	TArray<USessionSearchResultWrapper*> Results;
@@ -70,6 +71,8 @@ public:
 
 	bool JoinSession(FName SessionName, const FOnlineSessionSearchResult& SearchResult);
 
+	virtual bool JoinSession(ULocalPlayer* player, int32 id) override;
+
 	FOnJoinSessionCompleteDelegate OnJoinSessionCompleteDelegate;
 
 	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
@@ -95,4 +98,9 @@ public:
 	/* Called to signal to blueprints that the read is complete */
 	UPROPERTY(BlueprintAssignable, Category="Online|Friends")
 	FFriendsReadCompleteDelegate FriendsReadComplete;
+
+	FOnSessionUserInviteAcceptedDelegate SessionUserInviteAcceptedDelegate;
+	FDelegateHandle SessionUserInviteAcceptedDelegateHandle;
+
+	virtual void SessionUserInviteAccepted(const bool bWasSuccessful, const int32 number, TSharedPtr<const FUniqueNetId> userId, const FOnlineSessionSearchResult& sessionResult);
 };

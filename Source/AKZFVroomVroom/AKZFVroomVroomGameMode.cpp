@@ -53,7 +53,18 @@ void AAKZFVroomVroomGameMode::Logout(AController* controller)
 	}
 }
 
+APawn* AAKZFVroomVroomGameMode::SpawnDefaultPawnAtTransform_Implementation(AController * NewPlayer, const FTransform & SpawnTransform)
+{
+	FActorSpawnParameters parameters;
+	parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	parameters.Instigator = Instigator;
+	parameters.ObjectFlags |= RF_Transient;
+	UClass* PawnClass = GetDefaultPawnClassForController(NewPlayer);
+	APawn* Actor = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, parameters);
+	return Actor;
+}
+
 void AAKZFVroomVroomGameMode::SpawnSpectatorForController(AAKZFRacePlayerController* controller)
 {
-
+	
 }
