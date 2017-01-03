@@ -14,6 +14,8 @@ AAKZFRaceCheckpoint::AAKZFRaceCheckpoint()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootComponent = CreateDefaultSubobject<UArrowComponent>(FName("Arrow"));
+
 	box = CreateDefaultSubobject<UBoxComponent>(FName("Collision Box"));
 	box->OnComponentBeginOverlap.AddDynamic(this, &AAKZFRaceCheckpoint::OnOverlapped);
 	//RootComponent = CreateDefaultSubobject<USceneComponent>(FName("Root Scenecomponent"));
