@@ -482,12 +482,19 @@ bool AAKZFVroomVroomPawn::isGrounded() {
 	FHitResult OutHit;
 	GetWorld()->SweepSingleByChannel(OutHit, beginLoc, endLoc, FQuat(), ECC_Visibility, FCollisionShape::MakeSphere(10), traceParams);
 
+	bool onGround = false;
+
+	// Before setting the blocking hit to true
+	// We should verify that we didn't hit another racing pawn.
 	if (OutHit.bBlockingHit) {
-		if (OutHit.GetActor()->ActorHasTag("Ground")) {
-			return true;
+		AActor* HitActor = OutHit.GetActor();
+		AAKZFVroomVroomPawn* pawn = Cast<AAKZFVroomVroomPawn>(HitActor);
+		if (!pawn)
+		{
+			onGround = true;
 		}
 	}
-	return false;
+	return onGround;
 }
 
 #undef LOCTEXT_NAMESPACE
