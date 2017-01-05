@@ -86,7 +86,7 @@ AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 
 	// Engine 
 	// Torque setup
-	Vehicle4W->MaxEngineRPM = 5700.0f;
+	Vehicle4W->MaxEngineRPM = 57000.0f;
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->Reset();
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(0.0f, 400.0f);
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(1890.0f, 500.0f);
@@ -124,7 +124,7 @@ AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 
 	// Set the inertia scale. This controls how the mass of the vehicle is distributed.
 	Vehicle4W->InertiaTensorScale = FVector(1.0f, 1.333f, 1.2f);
-
+	Vehicle4W->Mass = 3000.0f;
 	// Create a spring arm component for our chase camera
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 34.0f));
@@ -136,7 +136,8 @@ AAKZFVroomVroomPawn::AAKZFVroomVroomPawn()
 	SpringArm->bInheritPitch = true;
 	SpringArm->bInheritYaw = true;
 	SpringArm->bInheritRoll = true;
-
+	SpringArm->bEnableCameraLag = true;
+	SpringArm->CameraLagSpeed = 15.0f;
 	// Create the chase camera component 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("ChaseCamera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);

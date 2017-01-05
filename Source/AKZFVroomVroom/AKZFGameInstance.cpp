@@ -4,6 +4,8 @@
 #include "Data/SessionSearchResultWrapper.h"
 #include "AKZFGameInstance.h"
 
+#include <steam/steam_api.h>
+
 UAKZFGameInstance::UAKZFGameInstance()
 {
 	// Creation delegates
@@ -17,8 +19,16 @@ UAKZFGameInstance::UAKZFGameInstance()
 	OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UAKZFGameInstance::OnJoinSessionComplete);
 	// Read friends list delegate
 	OnReadFriendsListCompleteDelegate = FOnReadFriendsListComplete::CreateUObject(this, &UAKZFGameInstance::OnFriendsReadComplete);
-	// On Join Session 
 	
+	// Invite accepted
+	SessionUserInviteAcceptedDelegate = FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &UAKZFGameInstance::SessionUserInviteAccepted);
+	
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	if (Subsystem)
+	{
+		IOnlineSessionPtr Session = Subsystem->GetSessionInterface();
+		SessionUserInviteAcceptedDelegateHandle = Session->AddOnSessionUserInviteAcceptedDelegate_Handle(SessionUserInviteAcceptedDelegate);
+	}
 	
 }
 
@@ -325,6 +335,7 @@ TArray<UFriendBlueprintWrapper*> UAKZFGameInstance::GetFriendNames(int playerSlo
 					// Iterates through the given friends and adds them to the friend names array
 					UFriendBlueprintWrapper* wrappedFriend = NewObject<UFriendBlueprintWrapper>();
 					wrappedFriend->Friend = Friend;
+					wrappedFriend->Avatar = GetSteamAvatar(Friend->GetUserId());
 					WrappedFriends.Add(wrappedFriend);
 				}
 			}
@@ -342,6 +353,55 @@ TArray<UFriendBlueprintWrapper*> UAKZFGameInstance::GetFriendNames(int playerSlo
 bool UAKZFGameInstance::JoinSession(ULocalPlayer* player, int32 id)
 {
 	return false;
+}
+
+UTexture2D* UAKZFGameInstance::GetSteamAvatar(TSharedRef<const FUniqueNetId> netId)
+{
+	if (netId->IsValid())
+	{
+		uint32 Width = 0;
+		uint32 Height = 0;
+
+		uint64 id = *((uint64*)netId->GetBytes());
+
+		int Picture = 0;
+
+		Picture = SteamFriends()->GetMediumFriendAvatar(id);
+		
+		if (Picture == -1)
+			return nullptr;
+
+		SteamUtils()->GetImageSize(Picture, &Width, &Height);
+		
+		// Check the image size
+		if (Width > 0 && Height > 0)
+		{
+			// Create the image buffer
+			uint8 *oAvatarRGBA = new uint8[Width * Height * 4];
+			SteamUtils()->GetImageRGBA(Picture, (uint8*)oAvatarRGBA, 4 * Height * Width * sizeof(char));
+
+			UTexture2D* Avatar = UTexture2D::CreateTransient(Width, Height, PF_R8G8B8A8);
+			// Gets the platform MapData
+			uint8* MipData = (uint8*)Avatar->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+			// Copies AvatarRBGA to MipData
+			FMemory::Memcpy(MipData, (void*)oAvatarRGBA, Height * Width * 4);
+			Avatar->PlatformData->Mips[0].BulkData.Unlock();
+
+			delete[] oAvatarRGBA;
+
+			Avatar->PlatformData->NumSlices = 1;
+			Avatar->NeverStream = true;
+
+			Avatar->UpdateResource();
+
+			return Avatar;
+
+		}
+
+		return nullptr;
+	}
+	// I have failed sensei
+	return nullptr;
 }
 
 void UAKZFGameInstance::SessionUserInviteAccepted(const bool bWasSuccessful, const int32 number, TSharedPtr<const FUniqueNetId> userId, const FOnlineSessionSearchResult& sessionResult)

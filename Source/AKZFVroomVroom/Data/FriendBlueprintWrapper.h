@@ -23,4 +23,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Friend")
 	FString GetOnlineStatus();
 	
+	UPROPERTY(BlueprintReadOnly, Category = "Friend")
+	UTexture2D* Avatar;
 };

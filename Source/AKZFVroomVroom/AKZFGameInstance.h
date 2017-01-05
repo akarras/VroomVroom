@@ -98,9 +98,11 @@ public:
 	/* Called to signal to blueprints that the read is complete */
 	UPROPERTY(BlueprintAssignable, Category="Online|Friends")
 	FFriendsReadCompleteDelegate FriendsReadComplete;
-
+	/* Delegate & Handle for the player accepting an invite delegate. */
 	FOnSessionUserInviteAcceptedDelegate SessionUserInviteAcceptedDelegate;
 	FDelegateHandle SessionUserInviteAcceptedDelegateHandle;
+	/* Fetches the avatar for the steam ID. I have never been more excited in my life. */
+	UTexture2D* GetSteamAvatar(TSharedRef<const FUniqueNetId> netId);
 
 	virtual void SessionUserInviteAccepted(const bool bWasSuccessful, const int32 number, TSharedPtr<const FUniqueNetId> userId, const FOnlineSessionSearchResult& sessionResult);
 };
