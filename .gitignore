@@ -3,6 +3,9 @@
 
 # Generated Database Files
 *.db
+
+# Built Data
+*BuiltData.uasset
  
 # Compiled Object files
 *.slo
